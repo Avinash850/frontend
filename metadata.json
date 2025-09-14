@@ -1,0 +1,7 @@
+{
+  "name": "Prega Journey",
+  "description": "A platform to guide you through your pregnancy journey.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
