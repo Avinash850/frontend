@@ -13,3 +13,10 @@ export const fetchSearchSuggestions = async (query: string) => {
   const res = await API.get(`/api/suggest?q=${encodeURIComponent(query)}`);
   return res.data || {};
 };
+
+export const searchByLocationAndQuery = async (location: string, query: string) => {
+  const res = await API.get(`/api/search`, {
+    params: { location, query },
+  });
+  return res.data;
+};
