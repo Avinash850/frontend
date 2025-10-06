@@ -1,4 +1,28 @@
 import React, { useState, useEffect } from 'react';
+import { getDoctors } from "../services/doctorsService";
+
+
+// const Doctors = () => {
+//   const [doctors, setDoctors] = useState<any[]>([]);
+
+//   useEffect(() => {
+//     getDoctors()
+//       .then((data) => setDoctors(data))
+//       .catch((err) => console.error(err));
+//   }, []);
+
+//   return (
+//     <div>
+//       <h2>Doctors List</h2>
+//       <ul>
+//         {doctors.map((doc) => (
+//           <li key={doc.id}>{doc.name}</li>
+//         ))}
+//       </ul>
+//     </div>
+//   );
+// };
+
 
 // Re-defining DoctorResultCard here to keep this component self-contained for simplicity.
 // In a larger app, this would be a shared component.
