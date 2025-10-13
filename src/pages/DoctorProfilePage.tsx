@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { FaStar, FaPhoneAlt, FaEnvelope } from "react-icons/fa";
 import { DoctorContext } from "../context/DoctorContextProvider";
 import { HeroSearch } from "../components/HeroSearch";
+import defaultImage from "../assets/images/default_icon.png"
 
 const DoctorProfile = () => {
     const { profileData } = useContext(DoctorContext);
@@ -16,18 +17,15 @@ const DoctorProfile = () => {
                 profileData?.name ? <>
                     <div className="flex flex-col md:flex-row gap-6 mt-16">
                         {/* Profile Image */}
-                        {/* <div className="flex-shrink-0">
-                            <img
-                                // src={profileData.profile_image || "/images/default_doctor.jpg"}
-                                alt={profileData.name}
-                                className="w-40 h-40 md:w-48 md:h-48 object-cover rounded-full border-2 border-indigo-500"
-                            />
-                            </div> */}
                         <div className="flex-shrink-0 w-32 h-32 md:w-40 md:h-40 p-4">
                             <img
                                 src={profileData.profile_image || "/images/default_doctor.jpg"}
                                 alt={profileData.name}
-                                className="w-full h-full object-contain rounded-none" // Removed rounded-full
+                                className="w-full h-full object-contain rounded-full"
+                                onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.src = defaultImage;
+                                }}
                             />
                         </div>
 
