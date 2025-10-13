@@ -48,7 +48,10 @@ const App = () => {
           const slug = decodeURIComponent(path[1]);
           return (
             // <SearchLayout>
+            <Layout>
+              
               <DoctorProfile />
+            </Layout>
             // </SearchLayout>
           );
         }
