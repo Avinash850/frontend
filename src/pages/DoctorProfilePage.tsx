@@ -1,112 +1,101 @@
-import React, { useState, useEffect } from 'react';
+import React, { useContext } from "react";
+import { FaStar, FaPhoneAlt, FaEnvelope } from "react-icons/fa";
+import { DoctorContext } from "../context/DoctorContextProvider";
+import { HeroSearch } from "../components/HeroSearch";
 
-const DoctorProfilePage = ({ slug }) => {
-    const [doctor, setDoctor] = useState(null);
-    const [loading, setLoading] = useState(true);
+const DoctorProfile = () => {
+  const { profileData } = useContext(DoctorContext);
 
-    useEffect(() => {
-        const fetchDoctorDetails = async () => {
-            setLoading(true);
-            try {
-                const response = await fetch('/data/doctors.json');
-                const allDoctors = await response.json();
-                const foundDoctor = allDoctors.find(doc => doc.slug === slug);
-                setDoctor(foundDoctor);
-            } catch (error) {
-                console.error("Failed to fetch doctor details:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
+  console.log("profileData===>0", profileData)
 
-        if (slug) {
-            fetchDoctorDetails();
-        }
-    }, [slug]);
+  return (
+    <div className="max-w-4xl mx-auto my-10 p-6 bg-white rounded-2xl shadow-lg border border-gray-200">
 
-    if (loading) {
-        return <div className="container mx-auto px-6 py-8 text-center">Loading doctor profile...</div>;
-    }
-
-    if (!doctor) {
-        return <div className="container mx-auto px-6 py-8 text-center">Doctor not found.</div>;
-    }
-
-    return (
-        <div className="bg-slate-50">
-            <div className="container mx-auto px-6 py-12">
-                {/* Doctor Card */}
-                <div className="bg-white p-6 rounded-lg shadow-lg mb-8 flex flex-col md:flex-row items-start">
-                    <div className="flex-shrink-0 mb-4 md:mb-0 md:mr-6 text-center">
-                        <img src={doctor.image} alt={doctor.name} className="w-32 h-32 rounded-full mx-auto object-cover border-4 border-indigo-100" />
-                        {doctor.satisfaction && (
-                             <div className="mt-4 bg-green-100 text-green-800 text-sm font-semibold inline-flex items-center px-3 py-1 rounded-full">
-                                <svg className="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"></path></svg>
-                                {doctor.satisfaction}% Satisfaction ({doctor.reviewCount} reviews)
-                            </div>
-                        )}
-                    </div>
-                    <div className="flex-grow">
-                        <h1 className="text-3xl font-bold text-slate-800">{doctor.name}</h1>
-                        <p className="text-slate-600 mt-1">{doctor.specialty}</p>
-                        <p className="text-slate-500 text-sm">{doctor.experience} years experience</p>
-                        {doctor.bio && <p className="mt-4 text-slate-700">{doctor.bio}</p>}
-                    </div>
-                    <div className="w-full md:w-auto mt-6 md:mt-0 md:ml-6 flex-shrink-0">
-                        <button className="w-full bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-indigo-700 transition duration-300">
-                           Book Appointment
-                        </button>
-                    </div>
-                </div>
-
-                {/* Practice Locations */}
-                {doctor.practiceLocations && doctor.practiceLocations.length > 0 && (
-                    <div className="bg-white p-6 rounded-lg shadow-lg mb-8">
-                        <h2 className="text-2xl font-bold text-slate-800 mb-4">Practice Locations</h2>
-                        <div className="space-y-4">
-                            {doctor.practiceLocations.map((loc, index) => (
-                                <div key={index} className="border-b last:border-b-0 pb-4 last:pb-0">
-                                    <h3 className="text-xl font-semibold text-indigo-700">{loc.clinicName}</h3>
-                                    <p className="text-slate-600">{loc.area}, {loc.city}</p>
-                                    <div className="flex justify-between items-center mt-2">
-                                        <p className="text-lg font-semibold text-slate-800">₹{loc.consultationFee} <span className="text-sm font-normal text-slate-500">Consultation Fee</span></p>
-                                        <button className="border border-indigo-500 text-indigo-500 font-semibold py-2 px-4 rounded-lg hover:bg-indigo-500 hover:text-white transition duration-300 text-sm">
-                                            Book Clinic Visit
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-                
-                {/* About Section */}
-                 <div className="bg-white p-6 rounded-lg shadow-lg">
-                     <h2 className="text-2xl font-bold text-slate-800 mb-4">About {doctor.name}</h2>
-                     <div className="prose max-w-none text-slate-700">
-                        {doctor.bio && <p>{doctor.bio}</p>}
-                        {doctor.specializations && doctor.specializations.length > 0 && (
-                            <>
-                                <h3 className="text-xl font-semibold mt-6 mb-2">Specializations</h3>
-                                <ul className="list-disc list-inside">
-                                   {doctor.specializations.map((spec, i) => <li key={i}>{spec}</li>)}
-                                </ul>
-                            </>
-                        )}
-                         {doctor.education && doctor.education.length > 0 && (
-                            <>
-                                <h3 className="text-xl font-semibold mt-6 mb-2">Education</h3>
-                                <ul className="list-disc list-inside">
-                                {doctor.education.map((edu, i) => <li key={i}>{edu}</li>)}
-                                </ul>
-                            </>
-                         )}
-                     </div>
-                 </div>
-
-            </div>
+        <HeroSearch/>
+        {
+            profileData?.name ? <>
+             <div className="flex flex-col md:flex-row gap-6 mt-16">
+        {/* Profile Image */}
+        <div className="flex-shrink-0">
+          <img
+            // src={profileData.profile_image || "/images/default_doctor.jpg"}
+            alt={profileData.name}
+            className="w-40 h-40 md:w-48 md:h-48 object-cover rounded-full border-2 border-indigo-500"
+          />
         </div>
-    );
+
+        {/* Doctor Info */}
+        <div className="flex-1">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+            {profileData.name}
+          </h2>
+          <p className="text-indigo-600 font-semibold mt-1">
+            {profileData.specialization_name} | {profileData.degree}
+          </p>
+
+          <div className="flex items-center mt-3 gap-4">
+            <span className="text-gray-600">
+              <strong>Experience:</strong> {profileData.experience_years} yrs
+            </span>
+            <span className="flex items-center text-yellow-500 gap-1">
+              <FaStar /> {profileData.rating || "0.0"}
+            </span>
+          </div>
+
+          <div className="mt-4 text-gray-700">
+            <p className="mb-2">
+              <strong>Registration No:</strong> {profileData.registration_number}
+            </p>
+            <p className="mb-2">
+              <strong>Location:</strong> {profileData.address}, {profileData.city_name}
+            </p>
+            <p className="mb-2">
+              <strong>Consultation Fee:</strong> ₹{profileData.consultation_fee || "0"}
+            </p>
+          </div>
+
+          {/* Contact Info */}
+          <div className="mt-4 flex flex-col sm:flex-row sm:gap-6 text-gray-700">
+            <a
+              href={`tel:${profileData.phone_1}`}
+              className="flex items-center gap-2 hover:text-indigo-600 transition"
+            >
+              <FaPhoneAlt /> {profileData.phone_1}
+            </a>
+            {profileData.phone_2 && (
+              <a
+                href={`tel:${profileData.phone_2}`}
+                className="flex items-center gap-2 hover:text-indigo-600 transition"
+              >
+                <FaPhoneAlt /> {profileData.phone_2}
+              </a>
+            )}
+            <a
+              href={`mailto:${profileData.email}`}
+              className="flex items-center gap-2 hover:text-indigo-600 transition"
+            >
+              <FaEnvelope /> {profileData.email}
+            </a>
+          </div>
+
+          {/* About Section */}
+          {profileData.about && (
+            <div className="mt-6 text-gray-700">
+              <h3 className="font-semibold text-lg mb-2">About</h3>
+              <p>{profileData.about}</p>
+            </div>
+          )}
+        </div>
+      </div>
+            </>:<>
+             <div className="text-center py-16 text-gray-500">
+        Select a doctor to view profile details
+      </div>
+            </>
+        }
+     
+    </div>
+  );
 };
 
-export default DoctorProfilePage;
+export default DoctorProfile;

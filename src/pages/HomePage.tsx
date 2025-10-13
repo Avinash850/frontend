@@ -12,6 +12,7 @@ import GetInTouch from '../components/GetInTouch';
 const HomePage = () => (
     <>
         <Hero />
+     <div className="px-[4.5rem]">
         <Services />
         <OnlineConsultation />
         <Specialities />
@@ -20,6 +21,7 @@ const HomePage = () => (
         <FAQ />
         <Blogs />
         <GetInTouch />
+    </div>
     </>
 );
 

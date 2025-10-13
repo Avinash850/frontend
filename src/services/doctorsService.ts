@@ -1,3 +1,4 @@
+import axios from "axios";
 import API from "./api";
 
 // ✅ Fetch all doctors (optionally filter by query or location)
@@ -51,3 +52,16 @@ export const getDoctorSuggestions = async (query: string, location?: string) => 
     throw error;
   }
 };
+
+export const getDoctorDetails = async (payl) => {
+    try {
+      const { data } = await API.get(`http://localhost:8001/api/search/details`, {
+        params: {id: payl.id, type: payl.type}
+      });
+      console.log("details===>", data)
+      return data;
+    } catch (error) {
+      console.error("❌ Error fetching doctor details:", error);
+    throw error;
+    }
+  };

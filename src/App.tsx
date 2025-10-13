@@ -8,6 +8,7 @@ import SearchResultsPage from "./pages/SearchResultsPage";
 import DoctorProfilePage from "./pages/DoctorProfilePage";
 import TermsPage from "./pages/TermsPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
+import DoctorProfile from "./pages/DoctorProfilePage";
 
 const App = () => {
   const [route, setRoute] = useState(window.location.hash);
@@ -46,9 +47,9 @@ const App = () => {
         if (path[1]) {
           const slug = decodeURIComponent(path[1]);
           return (
-            <SearchLayout>
-              <DoctorProfilePage slug={slug} />
-            </SearchLayout>
+            // <SearchLayout>
+              <DoctorProfile />
+            // </SearchLayout>
           );
         }
         break;
