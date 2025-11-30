@@ -38,8 +38,8 @@ const LocationSearch = () => {
   const handleSearch = async () => {
     try {
       setIsLoading(true);
-      const { data } = await axios.get(
-        `http://localhost:8001/api/locations/suggest?q=${query}`
+     const { data } = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/api/locations/suggest?q=${query}`
       );
       setLocations(data?.results || []);
     //   setShowList(true);

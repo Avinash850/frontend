@@ -1,5 +1,7 @@
 import axios from "axios";
 import API from "./api";
+// const API = import.meta.env.VITE_API_BASE_URL;
+
 
 // ✅ Fetch all doctors (optionally filter by query or location)
 export const getDoctors = async (query?: string, location?: string) => {
@@ -55,7 +57,7 @@ export const getDoctorSuggestions = async (query: string, location?: string) => 
 
 export const getDoctorDetails = async (payl) => {
     try {
-      const { data } = await API.get(`http://localhost:8001/api/search/details`, {
+      const { data } = await API.get(`${import.meta.env.VITE_API_BASE_URL}/api/search/details`, {
         params: {id: payl.id, type: payl.type}
       });
       console.log("details===>", data)
@@ -65,3 +67,36 @@ export const getDoctorDetails = async (payl) => {
     throw error;
     }
   };
+
+
+
+
+// import axios from "axios";
+
+
+export const doctorService = {
+  // ✅ Fetch all doctors
+  getDoctors: async () => {
+    return axios.get(`${API}/api/doctors`);
+  },
+
+  // ✅ Create new doctor
+  createDoctor: async (payload) => {
+    return axios.post(`${API}/api/doctors`, payload);
+  },
+
+  // ✅ Update doctor
+  updateDoctor: async (id, payload) => {
+    return axios.put(`${API}/api/doctors/${id}`, payload);
+  },
+
+  // ✅ Delete doctor
+  deleteDoctor: async (id) => {
+    return axios.delete(`${API}/api/doctors/${id}`);
+  },
+
+  // ✅ Get single doctor (for view/edit details)
+  getDoctorById: async (id) => {
+    return axios.get(`${API}/api/doctors/${id}`);
+  },
+};

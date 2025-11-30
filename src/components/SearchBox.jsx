@@ -51,7 +51,7 @@ const SearchBox = () => {
   const handleSearch = async () => {
     try {
       setIsLoading(true);
-      const { data } = await axios.get(`http://localhost:8001/api/suggest?q=${query || ""}`);
+      const { data } = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/suggest?q=${query || ""}`);
       setResults(data || { doctors: [], clinics: [], hospitals: [] });
     } catch (error) {
       console.error("handleSearch error:", error);
