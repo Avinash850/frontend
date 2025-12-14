@@ -1,31 +1,39 @@
 // src/pages/LoginPage.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { loginUser } from '../services/authService'; // <-- REAL API LOGIN
 
 const LoginPage = () => {
   const navigate = useNavigate();
   
-  // State to hold email and password input values
+  // State for inputs
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  // Handle form submission
-  const handleLogin = (e: React.FormEvent) => {
+  // Handle form submit
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Simple validation (can be improved later)
+
     if (!email || !password) {
       setError('Please fill in both fields.');
       return;
     }
 
-    // Here, we check the hardcoded credentials
-    if (email === 'admin@example.com' && password === 'password') {
-      // Redirect to admin dashboard after successful login
-      navigate('/admin/dashboard'); // Redirects to admin dashboard
-    } else {
-      setError('Invalid credentials, please try again.');
+    try {
+      // 🔥 REAL BACKEND LOGIN CALL
+      const res = await loginUser(email, password);
+
+      // Save JWT token
+      localStorage.setItem("token", res.token);
+      localStorage.setItem("name", res.name);
+      localStorage.setItem("email", res.email);
+
+      // Redirect to admin dashboard
+      navigate('/admin/dashboard');
+
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Login failed. Please try again.");
     }
   };
 
@@ -37,6 +45,7 @@ const LoginPage = () => {
         {error && <p className="text-red-500 text-center">{error}</p>}
 
         <form onSubmit={handleLogin} className="space-y-4">
+          
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
             <input
@@ -70,7 +79,10 @@ const LoginPage = () => {
         </form>
 
         <p className="text-center text-sm text-gray-600">
-          Forgot your password? <a href="#" className="text-blue-600">Reset it here</a>
+          Forgot your password?{" "}
+          <a href="/forgot-password" className="text-blue-600">
+            Reset it here
+          </a>
         </p>
       </div>
     </div>

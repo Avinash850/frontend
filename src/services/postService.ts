@@ -1,30 +1,43 @@
-import axios from "axios";
-
-const API = import.meta.env.VITE_API_BASE_URL;
+import API from "./api";
 
 export const postService = {
   // ✅ Get all posts
   getPosts: async () => {
-    return axios.get(`${API}/api/posts`);
+    const res = await API.get("/api/posts");
+    return res.data;
   },
 
   // ✅ Get single post by ID
   getPostById: async (id: number) => {
-    return axios.get(`${API}/api/posts/${id}`);
+    const res = await API.get(`/api/posts/${id}`);
+    return res.data;
   },
 
-  // ✅ Create new post (JSON only)
-  createPost: async (data: any) => {
-    return axios.post(`${API}/api/posts`, data); // send plain JSON
+  // ✅ Create post (multipart – image + categories)
+  createPost: async (formData: FormData) => {
+    const res = await API.post("/api/posts", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data;
   },
 
-  // ✅ Update post (JSON only)
-  updatePost: async (id: number, data: any) => {
-    return axios.put(`${API}/api/posts/${id}`, data); // send plain JSON
+  // ✅ Update post (multipart – image + categories)
+  updatePost: async (id: number, formData: FormData) => {
+    const res = await API.put(`/api/posts/${id}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data;
   },
 
   // ✅ Delete post
   deletePost: async (id: number) => {
-    return axios.delete(`${API}/api/posts/${id}`);
+    const res = await API.delete(`/api/posts/${id}`);
+    return res.data;
+  },
+
+  // ✅ Categories master (for multi-select)
+  getCategories: async () => {
+    const res = await API.get("/api/categories");
+    return res.data;
   },
 };

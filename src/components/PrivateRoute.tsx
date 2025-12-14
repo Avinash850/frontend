@@ -1,12 +1,17 @@
 // src/components/PrivateRoute.tsx
-import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import React from "react";
+import { Navigate, Outlet } from "react-router-dom";
 
-// Simple route protection: Check for user authentication
 const PrivateRoute = () => {
-  const isAuthenticated = true; // You can replace this with actual authentication logic
+  const token = localStorage.getItem("token");
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" />;
+  // If no token => redirect to login
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // If token exists => allow access
+  return <Outlet />;
 };
 
 export default PrivateRoute;

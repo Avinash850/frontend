@@ -56,9 +56,10 @@ export const getDoctorSuggestions = async (query: string, location?: string) => 
 };
 
 export const getDoctorDetails = async (payl) => {
+  console.log("payl details -:", payl)
     try {
       const { data } = await API.get(`${import.meta.env.VITE_API_BASE_URL}/api/search/details`, {
-        params: {id: payl.id, type: payl.type}
+        params: {id: payl.id, type: payl.type, location: payl.selectedLocation}
       });
       console.log("details===>", data)
       return data;
@@ -74,29 +75,80 @@ export const getDoctorDetails = async (payl) => {
 // import axios from "axios";
 
 
+// Helper – prepare FormData for create & update
+const buildFormData = (payload: any, imageFile: File | null) => {
+  const formData = new FormData();
+
+  // append all primitive values
+  Object.keys(payload).forEach((key) => {
+    const value = payload[key];
+
+    // for arrays → append individually
+    if (Array.isArray(value)) {
+      value.forEach((v) => formData.append(`${key}[]`, v));
+    } else {
+      formData.append(key, value ?? "");
+    }
+  });
+
+  // append image file if exists
+  if (imageFile) {
+    formData.append("image", imageFile);
+  }
+
+  return formData;
+};
+
+
+
 export const doctorService = {
-  // ✅ Fetch all doctors
+  // ================================
+  // GET ALL DOCTORS
+  // ================================
   getDoctors: async () => {
-    return axios.get(`${API}/api/doctors`);
+    const res = await API.get(`/api/doctors`);
+    return res.data;
   },
 
-  // ✅ Create new doctor
-  createDoctor: async (payload) => {
-    return axios.post(`${API}/api/doctors`, payload);
+  // ================================
+  // CREATE DOCTOR
+  // ================================
+  createDoctor: async (payload: any, imageFile: File | null) => {
+    const formData = buildFormData(payload, imageFile);
+
+    const res = await API.post(`/api/doctors`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    return res.data;
   },
 
-  // ✅ Update doctor
-  updateDoctor: async (id, payload) => {
-    return axios.put(`${API}/api/doctors/${id}`, payload);
+  // ================================
+  // UPDATE DOCTOR
+  // ================================
+  updateDoctor: async (id: number, payload: any, imageFile: File | null) => {
+    const formData = buildFormData(payload, imageFile);
+
+    const res = await API.put(`/api/doctors/${id}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    return res.data;
   },
 
-  // ✅ Delete doctor
-  deleteDoctor: async (id) => {
-    return axios.delete(`${API}/api/doctors/${id}`);
+  // ================================
+  // DELETE DOCTOR
+  // ================================
+  deleteDoctor: async (id: number) => {
+    const res = await API.delete(`/api/doctors/${id}`);
+    return res.data;
   },
 
-  // ✅ Get single doctor (for view/edit details)
-  getDoctorById: async (id) => {
-    return axios.get(`${API}/api/doctors/${id}`);
+  // ================================
+  // GET SINGLE DOCTOR
+  // ================================
+  getDoctorById: async (id: number) => {
+    const res = await API.get(`/api/doctors/${id}`);
+    return res.data;
   },
 };
