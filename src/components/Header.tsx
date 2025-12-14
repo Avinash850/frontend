@@ -42,11 +42,10 @@ const Header = () => {
           <a href="#/doctors" className={`hover:text-indigo-600 ${getActiveClass('#/doctors')}`}>Find Doctors</a>
           <a href="#/video-consult" className={`hover:text-indigo-600 ${getActiveClass('#/video-consult')}`}>Video Consult</a>
           <a href="#/lab-tests" className={`hover:text-indigo-600 ${getActiveClass('#/lab-tests')}`}>Lab Tests</a>
-          <a href="#/pharmacy" className={`hover:text-indigo-600 ${getActiveClass('#/pharmacy')}`}>Pharmacy</a>
           <a href="#/blogs" className={`hover:text-indigo-600 ${getActiveClass('#/blogs')}`}>Blogs</a>
         </nav>
         <div className="hidden md:flex items-center space-x-4">
-          <a href="#/login" className="text-gray-600 hover:text-indigo-600">Login / Signup</a>
+          <a href="#/login" className="text-gray-600 hover:text-indigo-600">Login</a>
         </div>
         <button className="md:hidden">
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>

@@ -7,7 +7,7 @@ export default defineConfig(({ mode }) => {
   return {
     server: {
       proxy: {
-        "/api": "http://localhost:5000", // Proxy all /api calls to backend
+        "/api": "http://localhost:8001", // Proxy all /api calls to backend
       },
     },
     resolve: {

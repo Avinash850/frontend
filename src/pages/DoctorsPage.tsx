@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getDoctors } from "../services/doctorsService";
+import { HeroSearch } from '../components/HeroSearch';
+import ClinicList from '../components/ClinicCard';
 
 
 // const Doctors = () => {
@@ -88,35 +90,13 @@ const DoctorsPage = () => {
     );
 
     return (
-        <div className="bg-slate-100">
-            <div className="container mx-auto px-6 py-8">
-                 <div className="text-center mb-8">
-                    <h1 className="text-4xl font-bold text-slate-800">Find Our Doctors</h1>
-                    <p className="text-lg text-slate-600 mt-2">Browse through our list of expert medical professionals.</p>
-                </div>
-
-                <div className="bg-white p-4 rounded-lg shadow-sm mb-6 max-w-2xl mx-auto">
-                    <input 
-                        type="text" 
-                        placeholder="Search by doctor name or specialty..."
-                        className="p-3 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
-
-                <div className="max-w-4xl mx-auto">
-                    {loading ? (
-                        <p className="text-center">Loading doctors...</p>
-                    ) : (
-                        <div>
-                            <h2 className="text-xl font-semibold text-slate-800 mb-4">{filteredDoctors.length} doctors found</h2>
-                            {filteredDoctors.map(doc => <DoctorResultCard key={doc.slug} doctor={doc} />)}
-                        </div>
-                    )}
-                </div>
-            </div>
-        </div>
+        <div className="max-w-4xl mx-auto my-10 p-6 bg-white rounded-2xl shadow-lg border border-gray-200">
+       
+                   <HeroSearch/>
+                   
+                   <ClinicList/>
+       
+               </div>
     );
 };
 

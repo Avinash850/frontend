@@ -56,12 +56,12 @@ export const getDoctorSuggestions = async (query: string, location?: string) => 
 };
 
 export const getDoctorDetails = async (payl) => {
-  console.log("payl details -:", payl)
+  // console.log("payl details -:", payl)
     try {
       const { data } = await API.get(`${import.meta.env.VITE_API_BASE_URL}/api/search/details`, {
         params: {id: payl.id, type: payl.type, location: payl.selectedLocation}
       });
-      console.log("details===>", data)
+      // console.log("details===>", data)
       return data;
     } catch (error) {
       console.error("❌ Error fetching doctor details:", error);

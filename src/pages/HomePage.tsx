@@ -6,7 +6,7 @@ import Specialities from '../components/Specialities';
 import HowItWorks from '../components/HowItWorks';
 import Testimonials from '../components/Testimonials';
 import FAQ from '../components/FAQ';
-import Blogs from '../components/Blogs';
+// import Blogs from '../components/Blogs';
 import GetInTouch from '../components/GetInTouch';
 
 const HomePage = () => (
@@ -19,7 +19,7 @@ const HomePage = () => (
         <HowItWorks />
         <Testimonials />
         <FAQ />
-        <Blogs />
+        {/* <Blogs /> */}
         <GetInTouch />
     </div>
     </>

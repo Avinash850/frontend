@@ -1,36 +1,123 @@
 import React, { createContext, useState, ReactNode } from "react";
 
-// Optional: define Doctor type
+/* ===================== Types ===================== */
+
 export interface Doctor {
   id: number;
   name: string;
   type: string;
 }
 
-// Context type
 interface DoctorContextType {
+  /* ---------- Selected search item ---------- */
   selectedDetails: Doctor | null;
   setSelectedDetails: React.Dispatch<React.SetStateAction<Doctor | null>>;
 
-  profileData: Doctor | {};
-  setProfileData: React.Dispatch<React.SetStateAction<Doctor | {}>>;
+  /* ---------- Doctor / Hospital / Clinic profiles ---------- */
+  profileData: any;
+  setProfileData: React.Dispatch<React.SetStateAction<any>>;
+
+  hospitalData: any;
+  setHospitalData: React.Dispatch<React.SetStateAction<any>>;
+
+  clinicData: any;
+  setClinicData: React.Dispatch<React.SetStateAction<any>>;
+
+  mixedData: any;
+  setMixedData: React.Dispatch<React.SetStateAction<any>>;
+
+  /* ---------- Location ---------- */
+  selectedLocation: string | number | null;
+  setSelectedLocation: React.Dispatch<React.SetStateAction<string | number | null>>;
+
+  locationError: boolean;
+  setLocationError: React.Dispatch<React.SetStateAction<boolean>>;
+  validateLocation: () => boolean;
+
+  /* ---------- Breadcrumb → Search EVENTS ---------- */
+  locationQuery: string | null;
+  setLocationQuery: React.Dispatch<React.SetStateAction<string | null>>;
+
+  searchQuery: string | null;
+  setSearchQuery: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
+/* ===================== Context ===================== */
 
-// Create context
-export const DoctorContext = createContext<DoctorContextType | undefined>(undefined);
+export const DoctorContext = createContext<DoctorContextType | undefined>(
+  undefined
+);
 
-// Props type
+/* ===================== Provider ===================== */
+
 interface DoctorContextProviderProps {
   children: ReactNode;
 }
 
-// Provider component
-export default function DoctorContextProvider({ children }: DoctorContextProviderProps) {
+export default function DoctorContextProvider({
+  children,
+}: DoctorContextProviderProps) {
+  /* ---------- Search selection ---------- */
   const [selectedDetails, setSelectedDetails] = useState<Doctor | null>(null);
-  const [profileData, setProfileData] = useState<Doctor | {}>({});
 
-const value = { selectedDetails, setSelectedDetails , profileData, setProfileData}
+  /* ---------- Profile data ---------- */
+  const [profileData, setProfileData] = useState<any>(null);
+  const [hospitalData, setHospitalData] = useState<any>(null);
+  const [clinicData, setClinicData] = useState<any>(null);
+  const [mixedData, setMixedData] = useState<any>(null);
+
+  /* ---------- Location ---------- */
+  const [selectedLocation, setSelectedLocation] = useState<
+    string | number | null
+  >(null);
+
+  const [locationError, setLocationError] = useState(false);
+
+  /* ---------- Breadcrumb EVENTS ---------- */
+  const [locationQuery, setLocationQuery] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string | null>(null);
+
+  /* ---------- Helpers ---------- */
+  const validateLocation = () => {
+    if (!selectedLocation) {
+      setLocationError(true);
+      return false;
+    }
+    setLocationError(false);
+    return true;
+  };
+
+  /* ---------- Context value ---------- */
+  const value: DoctorContextType = {
+    selectedDetails,
+    setSelectedDetails,
+
+    profileData,
+    setProfileData,
+
+    hospitalData,
+    setHospitalData,
+
+    clinicData,
+    setClinicData,
+
+    mixedData,
+    setMixedData,
+
+    selectedLocation,
+    setSelectedLocation,
+
+    locationError,
+    setLocationError,
+    validateLocation,
+
+    locationQuery,
+    setLocationQuery,
+
+    searchQuery,
+    setSearchQuery,
+  };
+
   return (
     <DoctorContext.Provider value={value}>
       {children}

@@ -1,14 +1,16 @@
-// src/layout/SidebarLayout.tsx
-import React, { useState } from "react";
+
+import React from "react";
 import { Link, useLocation, Outlet } from "react-router-dom";
 import HeaderAdmin from "./HeaderAdmin";
 
 const SidebarLayout: React.FC = () => {
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState(location.pathname);
 
   const isActive = (path: string) =>
-    activeTab === path ? "bg-blue-500" : "text-red hover:bg-blue-200";
+    location.pathname === path
+      ? "bg-[#f15c53] text-white"
+      : "text-slate-300 hover:bg-slate-800 hover:text-white";
+
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -16,80 +18,46 @@ const SidebarLayout: React.FC = () => {
 
       <div className="flex flex-1">
         {/* Sidebar */}
-        <div className="w-64 bg-gray-800 text-white p-5">
-          <div className="space-y-4">
-            <Link
-              to="/admin/dashboard"
-              className={`block py-2 px-4 rounded ${isActive("/admin/dashboard")}`}
-              onClick={() => setActiveTab("/admin/dashboard")}
-            >
-              Dashboard
-            </Link>
-            <Link
-              to="/admin/doctors"
-              className={`block py-2 px-4 rounded ${isActive("/admin/doctors")}`}
-              onClick={() => setActiveTab("/admin/doctors")}
-            >
-              Doctors
-            </Link>
-            <Link
-              to="/admin/clinics"
-              className={`block py-2 px-4 rounded ${isActive("/admin/clinics")}`}
-              onClick={() => setActiveTab("/admin/clinics")}
-            >
-              Clinics
-            </Link>
-            <Link
-              to="/admin/hospitals"
-              className={`block py-2 px-4 rounded ${isActive("/admin/hospitals")}`}
-              onClick={() => setActiveTab("/admin/hospitals")}
-            >
-              Hospitals
-            </Link>
-            <Link
-              to="/admin/blogs"
-              className={`block py-2 px-4 rounded ${isActive("/admin/blogs")}`}
-              onClick={() => setActiveTab("/admin/blogs")}
-            >
-              Blogs
-            </Link>
-            <Link
-              to="/admin/posts"
-              className={`block py-2 px-4 rounded ${isActive("/admin/posts")}`}
-              onClick={() => setActiveTab("/admin/posts")}
-            >
-              Posts
-            </Link>
-            <Link
-              to="/admin/company"
-              className={`block py-2 px-4 rounded ${isActive("/admin/company")}`}
-              onClick={() => setActiveTab("/admin/company")}
-            >
-              Company
-            </Link>
-            <Link
-              to="/admin/enquiry"
-              className={`block py-2 px-4 rounded ${isActive("/admin/enquiry")}`}
-              onClick={() => setActiveTab("/admin/enquiry")}
-            >
-              Enquiries
-            </Link>
-            <Link
-              to="/admin/profile"
-              className={`block py-2 px-4 rounded ${isActive("/admin/profile")}`}
-              onClick={() => setActiveTab("/admin/profile")}
-            >
-              Profile
-            </Link>
-          </div>
-        </div>
+        <aside className="w-64 bg-slate-900 p-5">
+          <nav className="space-y-2">
+            {[
+              { path: "/admin/dashboard", label: "Dashboard", icon: "dashboard" },
+              { path: "/admin/doctors", label: "Doctors", icon: "medical_services" },
+              { path: "/admin/clinics", label: "Clinics", icon: "local_hospital" },
+              { path: "/admin/hospitals", label: "Hospitals", icon: "apartment" },
+              { path: "/admin/blogs", label: "Blogs", icon: "article" },
+              { path: "/admin/posts", label: "Posts", icon: "post_add" },
+              { path: "/admin/enquiry", label: "Enquiries", icon: "support_agent" },
+              { path: "/admin/profile", label: "Profile", icon: "account_circle" },
+            ].map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`
+                  block px-4 py-3 rounded-lg
+                  transition-all duration-200
+                  ${isActive(item.path)}
+                `}
+              >
+                <span className="flex items-center gap-3">
+                  <span className="material-icons text-[20px] leading-none">
+                    {item.icon}
+                  </span>
+                  <span className="leading-none">{item.label}</span>
+                </span>
+
+
+              </Link>
+            ))}
+          </nav>
+        </aside>
 
         {/* Content Area */}
-        <div className="flex-1 p-6 bg-gray-100">
-          <div className="bg-white p-4 rounded-lg shadow-md">
-            <Outlet /> {/* ✅ renders DoctorsAdminPage and other nested routes */}
+        <main className="flex-1 p-6 bg-slate-100">
+          <div className="bg-white p-6 rounded-xl shadow-sm">
+            <Outlet />
           </div>
-        </div>
+        </main>
       </div>
     </div>
   );
