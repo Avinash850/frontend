@@ -44,6 +44,7 @@ const BlogListPage = () => {
         <div className="flex gap-6 px-6 py-8">
             {/* 70% Blogs */}
             <div className="w-[70%]">
+                <h2 className="text-2xl font-semibold mb-6 text-center">Pregajourney Article Content</h2>
                 <div className="grid grid-cols-2 gap-6">
                     {blogs.map(blog => (
                         <BlogCard key={blog.id} blog={blog} />

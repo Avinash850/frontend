@@ -15,13 +15,14 @@ const LocationSearch = () => {
   const [showList, setShowList] = useState(false);
   const dropdownRef = useRef(null);
 
+  console.log("locationQuery ----->", locationQuery)
 
 useEffect(() => {
   if (!locationQuery) return;
 
   setQuery(locationQuery);
   handleSearch();
-  setLocationQuery(null)
+  // setLocationQuery(null)
 }, [locationQuery]);
 
   // ✅ Close dropdown when clicking outside

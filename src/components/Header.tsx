@@ -23,7 +23,7 @@ const Header = () => {
   }, []);
 
   const navigateHome = () => {
-    window.location.hash = '#/';
+    window.location.hash = 'http://localhost:5173/';
   };
 
   const getActiveClass = (tab) => {
@@ -39,7 +39,7 @@ const Header = () => {
           </button>
         </div>
         <nav className="hidden md:flex items-center space-x-8">
-          <a href="#/doctors" className={`hover:text-indigo-600 ${getActiveClass('#/doctors')}`}>Find Doctors</a>
+          {/* <a href="#/doctors" className={`hover:text-indigo-600 ${getActiveClass('#/doctors')}`}>Find Doctors</a> */}
           <a href="#/video-consult" className={`hover:text-indigo-600 ${getActiveClass('#/video-consult')}`}>Video Consult</a>
           <a href="#/lab-tests" className={`hover:text-indigo-600 ${getActiveClass('#/lab-tests')}`}>Lab Tests</a>
           <a href="#/blogs" className={`hover:text-indigo-600 ${getActiveClass('#/blogs')}`}>Blogs</a>

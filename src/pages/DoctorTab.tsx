@@ -1,52 +1,86 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { FaStar, FaPhone } from "react-icons/fa";
 import { DoctorContext } from "../context/DoctorContextProvider";
-
-// ✅ Temporary dummy data (later replace with API data)
-const doctorProfileDatax = {
-  id: 1,
-  name: "Dr. Priya Sharma",
-  specialty: "Dermatologist",
-  location: "Greater Noida West, Greater Noida",
-  clinic: "Opal Care Clinic",
-  rating: 4.0,
-  fee: 600,
-  mode: "ON - CALL",
-  address: "Shop Number LG-39, Mahagun Mart, Gaur City-2, Opposite 11th Avenue, Greater Noida",
-  images: [
-    "/img1.jpg",
-    "/img2.jpg",
-    "/img3.jpg",
-    "/img4.jpg",
-    "/img5.jpg",
-  ],
-  tabs: [
-    {
-      title: "Info",
-      key: "info",
-    },
-    {
-      title: "Stories(23)",
-      key: "stories",
-    },
-    {
-      title: "Consult Q&A",
-      key: "consult",
-    },
-    {
-      title: "Healthfeed",
-      key: "healthfeed",
-    },
-  ],
-};
+import defaultImage from "../assets/images/default_icon.png";
 
 const DoctorProfileTabs = () => {
-  // const [doctorProfileData, setDoctorProfileData] = useState(null) 
-      const {profileData, setProfileData } = useContext(DoctorContext);
-  
+  const { profileData } = useContext(DoctorContext);
   const [activeTab, setActiveTab] = useState("info");
 
+  if (!profileData) return null;
 
+  const clinics = profileData.clinics || [];
+  const hospitals = profileData.hospitals || [];
+
+  const renderPracticeCard = (item, type) => {
+    const timing = item.timings || item.timing || "Timing not available";
+    const fee = item.consultation_fee
+      ? `₹ ${item.consultation_fee}`
+      : "Fee not available";
+    const address = item.practice_address || item.address;
+
+    return (
+      <div
+        key={`${type}-${item.id}`}
+        className="flex gap-4 border border-gray-200 rounded-xl p-4 mb-4"
+      >
+        {/* Image */}
+        <div className="w-24 h-24 flex-shrink-0">
+          <img
+            src={item.image_url || defaultImage}
+            alt={item.name}
+            className="w-full h-full object-cover rounded-lg border"
+            onError={(e) => (e.currentTarget.src = defaultImage)}
+          />
+        </div>
+
+        {/* Content */}
+        <div className="flex-1">
+          <h4 className="text-blue-600 font-semibold text-lg">
+            {item.name}
+          </h4>
+
+          {/* Rating */}
+          {item.rating && (
+            <div className="flex items-center text-sm mt-1 text-green-700 font-medium">
+              {item.rating} <FaStar className="ml-1" />
+            </div>
+          )}
+
+          {/* Timing & Fee */}
+          <div className="text-sm text-gray-700 mt-2 space-y-1">
+            <p>
+              <span className="font-medium">Timing:</span> {timing}
+            </p>
+            <p>
+              <span className="font-medium">Fee:</span> {fee}
+            </p>
+          </div>
+
+          {/* Address */}
+          {address && (
+            <p className="text-sm text-gray-600 mt-2">
+              {address}
+            </p>
+          )}
+
+          {/* Description */}
+          {(item.short_description || item.about) && (
+            <p className="text-sm text-gray-500 mt-2 line-clamp-2">
+              {item.short_description || item.about}
+            </p>
+          )}
+        </div>
+
+        {/* Action */}
+        <div className="flex items-end">
+          <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium">
+            <FaPhone /> Call
+          </button>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow p-5">
@@ -56,7 +90,7 @@ const DoctorProfileTabs = () => {
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-4 py-2 text-sm font-semibold whitespace-nowrap transition-all border-b-2 ${
+            className={`px-4 py-2 text-sm font-semibold whitespace-nowrap border-b-2 ${
               activeTab === tab.key
                 ? "text-blue-600 border-blue-600"
                 : "text-gray-600 border-transparent hover:text-blue-500"
@@ -69,54 +103,37 @@ const DoctorProfileTabs = () => {
 
       {/* Tab Content */}
       <div className="p-2">
-        {/* Info Tab */}
         {activeTab === "info" && (
-          <div>
-            <p className="text-gray-800 font-medium mb-1">
-              {profileData.location}
-            </p>
-
-            <h2 className="text-blue-600 font-semibold text-lg mb-1">
-              {profileData.clinic}
-            </h2>
-
-            <div className="flex items-center flex-wrap gap-3 mb-3 text-sm">
-              <div className="flex items-center bg-green-100 text-green-700 font-semibold px-2 py-1 rounded">
-                {profileData.rating} <FaStar className="ml-1 text-green-600" />
+          <div className="space-y-6">
+            {clinics.length > 0 && (
+              <div>
+                <h3 className="text-lg font-semibold mb-3">Clinics</h3>
+                {clinics.map((c) => renderPracticeCard(c, "clinic"))}
               </div>
-              <p className="font-bold text-gray-800">{profileData.mode}</p>
-              <p className="text-gray-700">₹{profileData.fee}</p>
-            </div>
+            )}
 
-            <p className="text-gray-700 mb-1">{profileData.address}</p>
-            <p className="text-blue-500 font-medium mb-3 cursor-pointer">
-              Get Directions
-            </p>
-
-            {/* Clinic Images */}
-            <div className="flex items-center gap-2 mb-4">
-              {profileData?.images?.slice(0, 4).map((img, idx) => (
-                <img
-                  key={idx}
-                  src={img}
-                  alt="clinic"
-                  className="w-14 h-14 rounded-md object-cover border border-gray-200"
-                />
-              ))}
-              <div className="w-14 h-14 flex items-center justify-center bg-gray-100 rounded-md text-gray-600 font-semibold border border-gray-200">
-                +{profileData?.images?.length - 4}
+            {hospitals.length > 0 && (
+              <div>
+                <h3 className="text-lg font-semibold mb-3">Hospitals</h3>
+                {hospitals.map((h) => renderPracticeCard(h, "hospital"))}
               </div>
-            </div>
+            )}
 
-            <div className="flex justify-end">
-              <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-medium shadow-md transition-all">
-                <FaPhone /> Call Now
-              </button>
-            </div>
+            {clinics.length === 0 && hospitals.length === 0 && (
+              <p className="text-gray-500 text-sm">
+                No practice locations available.
+              </p>
+            )}
           </div>
         )}
 
-        {/* Stories Tab */}
+        {activeTab !== "info" && (
+          <div className="text-gray-500 text-sm">
+            Content coming soon.
+          </div>
+        )}
+
+         {/* Stories Tab */}
         {activeTab === "stories" && (
           <div className="space-y-3">
             {[...Array(3)].map((_, i) => (
@@ -169,8 +186,8 @@ const DoctorProfileTabs = () => {
               </div>
             ))}
           </div>
-        )}
-      </div>
+         )}
+           </div>
     </div>
   );
 };

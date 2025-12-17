@@ -3,6 +3,8 @@ import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 import MultiSelect from "./MultiSelect";
 import { doctorService } from "../services/doctorsService";
+import { quillModules, quillFormats } from "@/editor/quillConfig";
+
 
 type Props = {
   mode: "add" | "edit";
@@ -16,7 +18,6 @@ const emptyForm = {
   name: "",
   slug: "",
   designation: "",
-  type: "Medical Team",
   short_description: "",
   description: "",
   seo_title: "",
@@ -65,9 +66,8 @@ const DoctorForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
         name: initialData.name ?? "",
         slug: initialData.slug ?? "",
         designation: initialData.designation ?? "",
-        type: initialData.type ?? "Medical Team",
         short_description: initialData.short_description ?? "",
-        description: initialData.description ?? "",
+        description: typeof initialData.description === "string" ? initialData.description : "",
         seo_title: initialData.seo_title ?? "",
         seo_keywords: initialData.seo_keywords ?? "",
         seo_description: initialData.seo_description ?? "",
@@ -144,7 +144,6 @@ const DoctorForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
       name: form.name,
       slug: form.slug || form.name.toLowerCase().replace(/\s+/g, "-"),
       designation: form.designation,
-      type: form.type,
       short_description: form.short_description,
       description: form.description,
       seo_title: form.seo_title,
@@ -210,18 +209,6 @@ const DoctorForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-1">Type</label>
-              <select
-                value={form.type}
-                onChange={(e) => setForm({ ...form, type: e.target.value })}
-                className="w-full px-3 py-2 border rounded-md"
-              >
-                <option>Medical Team</option>
-                <option>Visiting Specialist</option>
-                <option>Other</option>
-              </select>
-            </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">Short description</label>
@@ -355,7 +342,8 @@ const DoctorForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
 
         <div>
           <label className="block text-sm font-medium mb-1">Description</label>
-          <ReactQuill value={form.description} onChange={(val) => setForm({ ...form, description: val })} />
+        <ReactQuill   key={form.id || "new"}  value={form.description || ""}  onChange={(val) => setForm({ ...form, description: val })}
+              modules={quillModules}  formats={quillFormats}/>
         </div>
 
         {/* SEO & JSON */}

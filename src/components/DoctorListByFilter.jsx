@@ -49,7 +49,7 @@ const DoctorListByFilter = ({ id, type, onSelectDoctor }) => {
       >
         <div className="flex flex-col items-center">
           <img
-            src={doctorData.profile_image || defaultImage}
+            src={doctorData.image_url || defaultImage}
             alt={doctorData.name}
             className="w-28 h-28 rounded-full object-cover border border-gray-200"
           />

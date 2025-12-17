@@ -3,6 +3,7 @@ import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 import MultiSelect from "./MultiSelect";
 import { clinicService } from "../services/clinicService";
+import { quillModules, quillFormats } from "@/editor/quillConfig";
 
 type Props = {
   mode: "add" | "edit";
@@ -38,7 +39,7 @@ const emptyForm = {
   doctors: [] as number[],
 };
 
-const safe = (v: any) => (v === null || v === undefined ? "" : v);
+const safe = (v: any) => (v ?? "");
 
 const ClinicForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) => {
   const [form, setForm] = useState({ ...emptyForm });
@@ -56,7 +57,6 @@ const ClinicForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
     return areas.filter(a => String(a.city_id) === String(form.city_id));
   }, [areas, form.city_id]);
 
-  // PREFILL (EDIT)
   useEffect(() => {
     if (mode === "edit" && initialData) {
       setForm({
@@ -78,7 +78,6 @@ const ClinicForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
         imagePreview: safe(initialData.image_url),
         city_id: safe(initialData.city_id),
         area_id: safe(initialData.area_id),
-
         specializations: initialData.specializations || [],
         services: initialData.services || [],
         procedures: initialData.procedures || [],
@@ -88,12 +87,9 @@ const ClinicForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
     }
   }, [initialData, mode]);
 
-  // LOAD MASTERS
   useEffect(() => {
     const load = async () => {
-      const [
-        sp, se, pr, sy, dr, ct, ar
-      ] = await Promise.all([
+      const [sp, se, pr, sy, dr, ct, ar] = await Promise.all([
         clinicService.getSpecializations(),
         clinicService.getServices(),
         clinicService.getProcedures(),
@@ -142,87 +138,220 @@ const ClinicForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
   };
 
   return (
-    <div className="max-h-[80vh] overflow-y-auto space-y-4">
-      {/* BASIC */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="md:col-span-2 space-y-3">
-          <input placeholder="Name" value={form.name}
-            onChange={e => setForm({ ...form, name: e.target.value })}
-            className="w-full border p-2 rounded" />
+    <div className="max-h-[80vh] overflow-y-auto px-1">
+      <div className="space-y-4 pb-4">
 
-          <div className="grid grid-cols-2 gap-3">
-            <input placeholder="Slug" value={form.slug}
-              onChange={e => setForm({ ...form, slug: e.target.value })}
-              className="border p-2 rounded" />
-            <input placeholder="Timing" value={form.timing}
-              onChange={e => setForm({ ...form, timing: e.target.value })}
-              className="border p-2 rounded" />
+        {/* BASIC */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="md:col-span-2 space-y-3">
+            <div>
+              <label className="block text-sm font-medium mb-1">Name</label>
+              <input
+                value={form.name}
+                onChange={e => setForm({ ...form, name: e.target.value })}
+                className="w-full px-3 py-2 border rounded-md"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium mb-1">Slug</label>
+                <input
+                  value={form.slug}
+                  onChange={e => setForm({ ...form, slug: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-md"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Timing</label>
+                <input
+                  value={form.timing}
+                  onChange={e => setForm({ ...form, timing: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-md"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Short Description</label>
+              <textarea
+                rows={3}
+                value={form.short_description}
+                onChange={e => setForm({ ...form, short_description: e.target.value })}
+                className="w-full px-3 py-2 border rounded-md"
+              />
+            </div>
           </div>
 
-          <textarea placeholder="Short Description"
-            value={form.short_description}
-            onChange={e => setForm({ ...form, short_description: e.target.value })}
-            className="border p-2 rounded" />
+          {/* IMAGE */}
+          <div>
+            <label className="block text-sm font-medium mb-1">Image</label>
+            <div className="border p-2 rounded">
+              {form.imagePreview && (
+                <img src={form.imagePreview} className="h-40 w-full object-cover rounded" />
+              )}
+              <input type="file" onChange={e => handleImageChange(e.target.files?.[0] || null)} />
+            </div>
+          </div>
         </div>
 
-        {/* IMAGE */}
+        {/* CONTACT */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div>
+            <label className="block text-sm font-medium mb-1">Phone 1</label>
+            <input
+              value={form.phone_1}
+              onChange={e => setForm({ ...form, phone_1: e.target.value })}
+              className="w-full px-3 py-2 border rounded-md"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Phone 2</label>
+            <input
+              value={form.phone_2}
+              onChange={e => setForm({ ...form, phone_2: e.target.value })}
+              className="w-full px-3 py-2 border rounded-md"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Website</label>
+            <input
+              value={form.website}
+              onChange={e => setForm({ ...form, website: e.target.value })}
+              className="w-full px-3 py-2 border rounded-md"
+            />
+          </div>
+        </div>
+
         <div>
-          {form.imagePreview && <img src={form.imagePreview} className="h-40 w-full object-cover rounded" />}
-          <input type="file" onChange={e => handleImageChange(e.target.files?.[0] || null)} />
+          <label className="block text-sm font-medium mb-1">Address</label>
+          <textarea
+            rows={3}
+            value={form.address}
+            onChange={e => setForm({ ...form, address: e.target.value })}
+            className="w-full px-3 py-2 border rounded-md"
+          />
         </div>
-      </div>
 
-      {/* CONTACT */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <input placeholder="Phone 1" value={form.phone_1} onChange={e => setForm({ ...form, phone_1: e.target.value })} className="border p-2 rounded" />
-        <input placeholder="Phone 2" value={form.phone_2} onChange={e => setForm({ ...form, phone_2: e.target.value })} className="border p-2 rounded" />
-        <input placeholder="Website" value={form.website} onChange={e => setForm({ ...form, website: e.target.value })} className="border p-2 rounded" />
-      </div>
+        {/* LOCATION */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">City</label>
+            <select
+              value={form.city_id}
+              onChange={e => setForm({ ...form, city_id: e.target.value, area_id: "" })}
+              className="w-full px-3 py-2 border rounded-md"
+            >
+              <option value="">Select City</option>
+              {cities.map(c => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+          </div>
 
-      <textarea placeholder="Address" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} className="border p-2 rounded" />
+          <div>
+            <label className="block text-sm font-medium mb-1">Area</label>
+            <select
+              value={form.area_id}
+              onChange={e => setForm({ ...form, area_id: e.target.value })}
+              className="w-full px-3 py-2 border rounded-md"
+            >
+              <option value="">Select Area</option>
+              {filteredAreas.map(a => (
+                <option key={a.id} value={a.id}>{a.name}</option>
+              ))}
+            </select>
+          </div>
+        </div>
 
-      {/* LOCATION */}
-      <div className="grid grid-cols-2 gap-4">
-        <select value={form.city_id} onChange={e => setForm({ ...form, city_id: e.target.value, area_id: "" })} className="border p-2 rounded">
-          <option value="">City</option>
-          {cities.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-        </select>
+        {/* MULTI SELECTS */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <MultiSelect label="Specializations" options={specializations} selected={form.specializations}
+            onChange={v => setForm({ ...form, specializations: v })} />
+          <MultiSelect label="Services" options={services} selected={form.services}
+            onChange={v => setForm({ ...form, services: v })} />
+        </div>
 
-        <select value={form.area_id} onChange={e => setForm({ ...form, area_id: e.target.value })} className="border p-2 rounded">
-          <option value="">Area</option>
-          {filteredAreas.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-        </select>
-      </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <MultiSelect label="Procedures" options={procedures} selected={form.procedures}
+            onChange={v => setForm({ ...form, procedures: v })} />
+          <MultiSelect label="Symptoms" options={symptoms} selected={form.symptoms}
+            onChange={v => setForm({ ...form, symptoms: v })} />
+        </div>
 
-      {/* MULTI SELECTS – SAME AS HOSPITAL */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <MultiSelect label="Specializations" options={specializations} selected={form.specializations} onChange={v => setForm({ ...form, specializations: v })} />
-        <MultiSelect label="Services" options={services} selected={form.services} onChange={v => setForm({ ...form, services: v })} />
-      </div>
+        <MultiSelect label="Doctors" options={doctors} selected={form.doctors}
+          onChange={v => setForm({ ...form, doctors: v })} />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <MultiSelect label="Procedures" options={procedures} selected={form.procedures} onChange={v => setForm({ ...form, procedures: v })} />
-        <MultiSelect label="Symptoms" options={symptoms} selected={form.symptoms} onChange={v => setForm({ ...form, symptoms: v })} />
-      </div>
+        {/* ABOUT */}
+        {/* <div>
+          <label className="block text-sm font-medium mb-1">About</label>
+          <ReactQuill value={form.about} onChange={v => setForm({ ...form, about: v })} />
+        </div> */}
 
-      <MultiSelect label="Doctors" options={doctors} selected={form.doctors} onChange={v => setForm({ ...form, doctors: v })} />
+        <div>
+          <label className="block text-sm font-medium mb-1">About</label>
+          <ReactQuill
+            value={form.about || ""}
+            onChange={(v) => setForm({ ...form, about: v })}
+            modules={quillModules}
+            formats={quillFormats}
+          />
+        </div>
 
-      {/* ABOUT */}
-      <ReactQuill value={form.about} onChange={v => setForm({ ...form, about: v })} />
+        {/* SEO & JSON */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">SEO Title</label>
+            <input
+              value={form.seo_title}
+              onChange={e => setForm({ ...form, seo_title: e.target.value })}
+              className="w-full px-3 py-2 border rounded-md"
+            />
+          </div>
 
-      {/* SEO */}
-      <input placeholder="SEO Title" value={form.seo_title} onChange={e => setForm({ ...form, seo_title: e.target.value })} className="border p-2 rounded" />
-      <input placeholder="SEO Keywords" value={form.seo_keywords} onChange={e => setForm({ ...form, seo_keywords: e.target.value })} className="border p-2 rounded" />
-      <textarea placeholder="SEO Description" value={form.seo_description} onChange={e => setForm({ ...form, seo_description: e.target.value })} className="border p-2 rounded" />
+          <div>
+            <label className="block text-sm font-medium mb-1">SEO Keywords</label>
+            <input
+              value={form.seo_keywords}
+              onChange={e => setForm({ ...form, seo_keywords: e.target.value })}
+              className="w-full px-3 py-2 border rounded-md"
+            />
+          </div>
+        </div>
 
-      <textarea placeholder="JSON Schema" value={form.json_schema} onChange={e => setForm({ ...form, json_schema: e.target.value })} className="border p-2 rounded" />
+        <div>
+          <label className="block text-sm font-medium mb-1">SEO Description</label>
+          <textarea
+            rows={3}
+            value={form.seo_description}
+            onChange={e => setForm({ ...form, seo_description: e.target.value })}
+            className="w-full px-3 py-2 border rounded-md"
+          />
+        </div>
 
-      {/* ACTIONS */}
-      <div className="flex justify-end gap-3">
-        <button onClick={onClose} className="border px-4 py-2 rounded">Cancel</button>
-        <button onClick={handleSubmit} className="bg-green-600 text-white px-4 py-2 rounded">
-          {mode === "add" ? "Save" : "Save Changes"}
-        </button>
+        <div>
+          <label className="block text-sm font-medium mb-1">JSON Schema</label>
+          <textarea
+            rows={4}
+            value={form.json_schema}
+            onChange={e => setForm({ ...form, json_schema: e.target.value })}
+            className="w-full px-3 py-2 border rounded-md font-mono text-sm"
+          />
+        </div>
+
+        {/* ACTIONS */}
+        <div className="flex justify-end gap-3 pt-2">
+          <button onClick={onClose} className="px-4 py-2 rounded-md border">
+            Cancel
+          </button>
+          <button onClick={handleSubmit} className="px-4 py-2 rounded-md bg-green-600 text-white">
+            {mode === "add" ? "Save" : "Save Changes"}
+          </button>
+        </div>
+
       </div>
     </div>
   );

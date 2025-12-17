@@ -12,7 +12,7 @@ const DoctorCard = ({ doctor }) => {
         {/* Doctor Image */}
         <div className="w-28 h-28 flex-shrink-0">
           <img
-            src={doctor.profile_image}
+            src={doctor.image_url}
             alt={doctor.name}
             className="w-full h-full object-cover rounded-full border"
           />

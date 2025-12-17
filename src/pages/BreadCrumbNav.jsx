@@ -2,8 +2,7 @@ import React, { useContext } from "react";
 import { DoctorContext } from "../context/DoctorContextProvider";
 
 const BreadcrumbNav = ({ profileData }) => {
-  // const {setAutoSelectQuery } = useContext(DoctorContext)
-  const { state_name, specialization_name, area_name, name  } = profileData;
+  const { state_name, specialization_name, area_name, name } = profileData;
 
   const {
     setLocationQuery,
@@ -11,26 +10,18 @@ const BreadcrumbNav = ({ profileData }) => {
     setSelectedLocation,
   } = useContext(DoctorContext);
 
+  // ✅ Clicking Delhi OR Hauz Khas
   const handleLocationClick = (locationValue) => {
-  setLocationQuery(locationValue);
-  setSelectedLocation(locationValue);
+    setSelectedLocation(locationValue);
+    setLocationQuery(locationValue);
 
-  // if (specialization_name) {
-  //   setAutoSelectQuery(specialization_name);
-  // }
-};
+    // always keep specialization in search box
+    if (specialization_name) {
+      setSearchQuery(specialization_name);
+    }
+  };
 
-
-
-  // const handleLocationClick = (locationValue) => {
-  //   setLocationQuery(locationValue);
-  //   setSelectedLocation(locationValue);
-
-  //   if (specialization_name) {
-  //     setSearchQuery(specialization_name);
-  //   }
-  // };
-
+  // ✅ Clicking specialization
   const handleSearchClick = (value) => {
     setSearchQuery(value);
   };

@@ -2,188 +2,211 @@ import React, { useState, useEffect } from "react";
 import { enquiryService } from "../services/enquiryService";
 import { hospitalService } from "../services/hospitalService";
 
-const GetInTouch = () => {
+type Props = {
+  variant?: "full" | "compact";
+};
+
+const GetInTouch = ({ variant = "full" }: Props) => {
+  const isCompact = variant === "compact";
+
   const [name, setName] = useState("");
   const [mobile, setMobile] = useState("");
   const [email, setEmail] = useState("");
-  const [city, setCity] = useState(""); // selected city name
+  const [city, setCity] = useState("");
   const [service, setService] = useState("");
   const [otherService, setOtherService] = useState("");
   const [showOtherService, setShowOtherService] = useState(false);
   const [message, setMessage] = useState("");
-  const [cities, setCities] = useState<{id: number, name: string}[]>([]);
+  const [cities, setCities] = useState<{ id: number; name: string }[]>([]);
 
   const [loading, setLoading] = useState(false);
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch cities from API
   useEffect(() => {
-    const fetchCities = async () => {
-      try {
-        const data = await hospitalService.getCities();
-        setCities(data); // assuming data is array of {id, name}
-      } catch (err) {
-        console.error("Failed to fetch cities:", err);
-      }
-    };
-    fetchCities();
+    hospitalService.getCities().then(setCities).catch(() => { });
   }, []);
 
-  const validateEmail = (value: string) => {
-    if (!value) return true;
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-  };
+  const validateEmail = (value: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setInfoMessage(null);
     setError(null);
+    setInfoMessage(null);
 
     if (!name.trim()) return setError("Patient name is required.");
     if (!mobile.trim()) return setError("Mobile number is required.");
-    if (!service || service === "Select a service") return setError("Please select a service.");
-    if (showOtherService && !otherService.trim()) return setError("Please enter your service in 'Other'.");
+    if (!email.trim()) return setError("Email is required.");
     if (!validateEmail(email)) return setError("Invalid email format.");
+    if (!service) return setError("Please select a service.");
+    if (showOtherService && !otherService.trim())
+      return setError("Please enter your service.");
 
     const payload = {
       name: name.trim(),
       mobile: mobile.trim(),
-      email: email.trim() || null,
-      city: city || null, // save city name
+      email: email.trim(),
+      city: city || null,
       service: showOtherService ? otherService.trim() : service,
-      message: message.trim() || null
+      message: message.trim() || null,
+      source_url: window.location.href,
     };
 
     try {
       setLoading(true);
       const res = await enquiryService.createEnquiry(payload);
       setInfoMessage(res.data?.message || "Enquiry submitted successfully!");
-      setName(""); setMobile(""); setEmail(""); setCity(""); setService(""); setOtherService(""); setMessage(""); setShowOtherService(false);
+      setName("");
+      setMobile("");
+      setEmail("");
+      setCity("");
+      setService("");
+      setOtherService("");
+      setMessage("");
+      setShowOtherService(false);
     } catch (err: any) {
-      console.error(err);
-      setError(err?.response?.data?.message || "Failed to submit enquiry. Please try again later.");
+      setError(
+        err?.response?.data?.message ||
+        "Failed to submit enquiry. Please try again."
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  const SendIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-      <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.428A1 1 0 009.172 15V4.828a1 1 0 00-1.02-0.998L2.793 4.575a1 1 0 00-1.169 1.409l7 14c.28.56.986.56 1.266 0l7-14a1 1 0 00-1.169-1.409l-5.403 1.25a1 1 0 00-.894.998V4.28a1 1 0 001.02.998l5.403-1.25a1 1 0 001.169-1.409l-7-14z" />
-    </svg>
-  );
-
   return (
-    <section className="py-12 sm:py-16 bg-slate-50">
-      <div className="container mx-auto px-4 sm:px-6 max-w-4xl">
-        <div className="text-center mb-10 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-800">Get in Touch</h2>
-          <p className="mt-2 sm:mt-3 text-base sm:text-lg text-slate-600">
+    <section className={`${isCompact ? "" : "py-8 sm:py-16 bg-slate-50"}`}>
+      <div
+        className={`${isCompact ? "" : "container mx-auto px-3 sm:px-6 max-w-4xl"}`}
+      >
+        {/* Heading */}
+        <div className={`text-center ${isCompact ? "mb-4" : "mb-8 sm:mb-12"}`}>
+          <h2
+            className={`font-bold text-slate-800 ${isCompact
+                ? "text-lg"
+                : "text-xl sm:text-3xl md:text-4xl"
+              }`}
+          >
+            Get in Touch
+          </h2>
+          <p
+            className={`mt-2 text-slate-600 ${isCompact ? "text-sm" : "text-sm sm:text-lg"
+              }`}
+          >
             Ready to take the next step? Our experts are here to help.
           </p>
         </div>
 
-        <div className="bg-white p-6 sm:p-8 md:p-10 rounded-2xl shadow-xl">
+        {/* Form Card */}
+        <div
+          className={`bg-white rounded-2xl shadow-xl ${isCompact ? "p-4" : "p-4 sm:p-8 md:p-10"
+            }`}
+        >
           <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-              {/* Name */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1 sm:mb-2">Patient Name *</label>
-                <input type="text" value={name} onChange={(e) => setName(e.target.value)}
-                  placeholder="Enter your full name"
-                  className="w-full bg-slate-100 p-2.5 sm:p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500"
-                />
-              </div>
+            <div
+              className={`grid grid-cols-1 ${isCompact ? "gap-3" : "md:grid-cols-2 gap-3 sm:gap-6"
+                }`}
+            >
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Patient Name *"
+                className={`w-full bg-slate-100 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500 ${isCompact ? "p-2 text-sm" : "p-2 sm:p-3 text-sm sm:text-base"
+                  }`}
+              />
 
-              {/* Mobile */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1 sm:mb-2">Mobile Number *</label>
-                <input type="tel" value={mobile} onChange={(e) => setMobile(e.target.value)}
-                  placeholder="Enter your mobile number"
-                  className="w-full bg-slate-100 p-2.5 sm:p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500"
-                />
-              </div>
+              <input
+                value={mobile}
+                onChange={(e) => setMobile(e.target.value)}
+                placeholder="Mobile Number *"
+                className={`w-full bg-slate-100 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500 ${isCompact ? "p-2 text-sm" : "p-2 sm:p-3 text-sm sm:text-base"
+                  }`}
+              />
 
-              {/* Email */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1 sm:mb-2">Email (Optional)</label>
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="w-full bg-slate-100 p-2.5 sm:p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500"
-                />
-              </div>
+              <input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email *"
+                className={`w-full bg-slate-100 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500 ${isCompact ? "p-2 text-sm" : "p-2 sm:p-3 text-sm sm:text-base"
+                  }`}
+              />
 
-              {/* Area dropdown */}
-              <div className="relative">
-                <label className="block text-sm font-semibold text-slate-700 mb-1 sm:mb-2">Select City (Optional)</label>
-                <select value={city} onChange={(e) => setCity(e.target.value)}
-                  className="w-full bg-slate-100 p-2.5 sm:p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500 appearance-none pr-8"
-                >
-                  <option value="">Select an city</option>
-                  {cities.map(city => (
-                    <option key={city.id} value={city.name}>{city.name}</option>
-                  ))}
-                </select>
-                <div className="absolute inset-y-0 right-0 top-7 px-3 text-slate-700">▼</div>
-              </div>
-
-              {/* Service */}
-              <div className="relative">
-                <label className="block text-sm font-semibold text-slate-700 mb-1 sm:mb-2">Select Service *</label>
-                <select value={service} onChange={(e) => {
-                  setService(e.target.value);
-                  setShowOtherService(e.target.value === "Other");
-                }}
-                  className="w-full bg-slate-100 p-2.5 sm:p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500 appearance-none pr-8"
-                >
-                  <option value="">Select a service</option>
-                  <option>Cardiology</option>
-                  <option>Dermatology</option>
-                  <option>Pediatrics</option>
-                  <option>General Inquiry</option>
-                  <option>Dental</option>
-                  <option>ENT</option>
-                  <option>Physiotherapy</option>
-                  <option>Other</option>
-                </select>
-                <div className="absolute inset-y-0 right-0 top-7 px-3 text-slate-700">▼</div>
-              </div>
+              <select
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                className={`w-full bg-slate-100 rounded-lg border border-slate-200 ${isCompact ? "p-2 text-sm" : "p-2 sm:p-3 text-sm sm:text-base"
+                  }`}
+              >
+                <option value="">Select City</option>
+                {cities.map((c) => (
+                  <option key={c.id} value={c.name}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+              <select value={service} onChange={(e) => {
+                setService(e.target.value);
+                setShowOtherService(e.target.value === "Other");
+              }}
+                className={`w-full bg-slate-100 border border-slate-200 rounded-lg              appearance-none leading-none
+                  ${isCompact
+                    ? "h-10 px-3 text-sm"
+                    : "h-12 px-4 text-base"}
+                `}
+              >
+                <option value="">Select Service *</option>
+                <option>Cardiology</option>
+                <option>Dermatology</option>
+                <option>Pediatrics</option>
+                <option>Dental</option>
+                <option>ENT</option>
+                <option>Physiotherapy</option>
+                <option>General Inquiry</option>
+                <option>Other</option>
+              </select>
 
               {showOtherService && (
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-semibold text-slate-700 mb-1 sm:mb-2">Enter Your Service *</label>
-                  <input type="text" value={otherService} onChange={(e) => setOtherService(e.target.value)}
-                    placeholder="Describe your service"
-                    className="w-full bg-slate-100 p-2.5 sm:p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
-              )}
-
-              {/* Message */}
-              <div className="md:col-span-2">
-                <label className="block text-sm font-semibold text-slate-700 mb-1 sm:mb-2">Message (Optional)</label>
-                <textarea value={message} onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Write your message here…"
-                  className="w-full bg-slate-100 p-2.5 sm:p-3 rounded-lg border border-slate-200 h-24 focus:ring-2 focus:ring-indigo-500"
+                <input value={otherService} onChange={(e) => setOtherService(e.target.value)}
+                  placeholder="Enter your service *"
+                  className={`w-full bg-slate-100 rounded-lg border border-slate-200 ${isCompact ? "p-2 text-sm" : "p-2 sm:p-3 text-sm sm:text-base"
+                    }`}
                 />
-              </div>
+              )}
+              <textarea value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="Message (Optional)"
+                className={`w-full bg-slate-100 rounded-lg border border-slate-200 h-24
+    ${isCompact ? "p-2 text-sm md:col-span-2" : "p-2 sm:p-3 text-sm sm:text-base md:col-span-2"}
+  `}
+              />
+
             </div>
 
-            {/* Submit */}
-            <div className="pt-5">
-              <button type="submit" disabled={loading}
-                className="w-full bg-gradient-to-r from-indigo-600 to-rose-500 text-white font-bold py-3 rounded-lg flex justify-center items-center gap-2 text-lg sm:text-lg shadow-lg disabled:opacity-60"
+            <div className="pt-4">
+              <button
+                type="submit"
+                disabled={loading}
+                className={`w-full bg-gradient-to-r from-indigo-600 to-rose-500 text-white font-bold rounded-lg ${isCompact
+                    ? "py-2 text-sm"
+                    : "py-2.5 sm:py-3 text-base sm:text-lg"
+                  }`}
               >
-                <SendIcon />
-                <span className="hidden sm:inline">{loading ? "Submitting..." : "Book Free Appointment"}</span>
-                <span className="sm:hidden">{loading ? "Submitting..." : "Book"}</span>
+                {loading ? "Submitting..." : "Book Free Appointment"}
               </button>
             </div>
           </form>
 
-          {infoMessage && <p className="text-center text-green-600 mt-4">{infoMessage}</p>}
-          {error && <p className="text-center text-red-600 mt-4">{error}</p>}
+          {infoMessage && (
+            <p className="text-center text-green-600 mt-4 text-sm">
+              {infoMessage}
+            </p>
+          )}
+          {error && (
+            <p className="text-center text-red-600 mt-4 text-sm">
+              {error}
+            </p>
+          )}
         </div>
       </div>
     </section>

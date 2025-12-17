@@ -1,304 +1,317 @@
 import { Swiper, SwiperSlide } from "swiper/react";
-import { motion, useScroll, useSpring, useReducedMotion } from "framer-motion";
-import { PlayCircle, Video, ShieldCheck, Clock } from "lucide-react";
+import { motion } from "framer-motion";
+import { Video, ShieldCheck, Clock, UserCheck } from "lucide-react";
 import { Autoplay, Pagination, Navigation } from "swiper/modules";
-
 
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
-
-
-
-
-const facilities = [
-  {
-    img: "https://images.unsplash.com/photo-1579684453423-f84349ef60b0",
-    title: "24/7 Virtual Clinics",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b",
-    title: "Remote Diagnostic Support",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1606206873764-fd15e242df52",
-    title: "Digital Prescriptions",
-  },
-];
-
 
 export default function VideoConsultPage() {
   return (
     <div className="bg-white text-slate-900">
 
       {/* ================= HERO ================= */}
-      <section className="relative h-[600px]">
+      <section className="relative h-[640px]">
         <img
-          src="https://images.unsplash.com/photo-1758691462749-a95ce1bd7f96?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+          src="https://images.unsplash.com/photo-1758691462749-a95ce1bd7f96"
           className="w-full h-full object-cover"
-          alt="American Hospital Telemedicine"
+          alt="Hospital Telemedicine"
         />
-        <div className="absolute inset-0 bg-black/50" />
+        <div className="absolute inset-0 bg-black/55" />
+
         <div className="absolute inset-0 flex items-center px-10">
           <div className="max-w-3xl text-white">
             <h1 className="text-5xl font-bold leading-tight">
-              Virtual Care From Leading Medical Experts
+              Trusted Virtual Care From Leading Medical Experts
             </h1>
-            <p className="mt-6 text-xl">
-              Secure video visits with U.S.-trained, board-certified physicians.
+            <p className="mt-6 text-xl text-white/90">
+              Secure video consultations with board-certified doctors — anytime, anywhere.
             </p>
-            <button className="mt-10 bg-blue-600 px-10 py-4 rounded-lg text-lg font-semibold">
-              Start Video Visit
+            <button className="mt-10 bg-blue-600 px-12 py-4 rounded-lg text-lg font-semibold">
+              Start Video Consultation
             </button>
           </div>
         </div>
       </section>
 
-
-
-
-      {/* FEATURES SECTION */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <motion.h2
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-4xl font-bold text-center mb-16"
-          >
-            Why Choose Our Video Consulting?
-          </motion.h2>
-
-
-          <div className="grid md:grid-cols-3 gap-10">
-            {[{ icon: Video, title: "HD Video Calls", desc: "Crystal clear consultations." },
-            { icon: ShieldCheck, title: "Secure & Private", desc: "End-to-end encrypted." },
-            { icon: Clock, title: "Save Time", desc: "No travel or waiting." }].map(
-              (item, i) => (
-                <motion.div
-                  key={i}
-                  whileHover={{ y: -10 }}
-                  className="rounded-3xl shadow-xl p-8 bg-white hover:shadow-2xl transition"
-                >
-                  <item.icon className="h-12 w-12 text-primary" />
-                  <h3 className="text-2xl font-semibold mt-6">{item.title}</h3>
-                  <p className="mt-4 text-slate-600">{item.desc}</p>
-                </motion.div>
-              )
-            )}
-          </div>
-        </div>
-      </section>
-
-
-      {/* ================= FACILITIES ================= */}
-      {/* <section className="py-24 px-6 max-w-7xl mx-auto">
-        <h2 className="text-4xl font-bold mb-16">
-          World-Class Virtual Care Facilities
-        </h2>
-
-        <div className="grid md:grid-cols-3 gap-10">
-          {[
-            {
-              img: "https://images.unsplash.com/photo-1579684453423-f84349ef60b0",
-              title: "24/7 Virtual Clinics",
-            },
-            {
-              img: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b",
-              title: "Remote Diagnostic Support",
-            },
-            {
-              img: "https://images.unsplash.com/photo-1606206873764-fd15e242df52",
-              title: "Digital Prescriptions",
-            },
-          ].map((f) => (
-            <div key={f.title}>
-              <img src={f.img} className="rounded-xl mb-4 h-[240px] w-full object-cover" />
-              <h3 className="text-xl font-semibold">{f.title}</h3>
-            </div>
-          ))}
-        </div>
-      </section> */}
-
-
-{/* ================= FACILITIES (CREATIVE SWIPER) ================= */}
-<section className="py-28 px-6 max-w-7xl mx-auto">
-  <h2 className="text-4xl font-bold mb-16">
-    World-Class Virtual Care Facilities
-  </h2>
-
-  <Swiper
-    modules={[Autoplay, Pagination]}
-    loop
-    autoplay={{
-      delay: 2600,
-      disableOnInteraction: false,
-      pauseOnMouseEnter: true,
-    }}
-    pagination={{ clickable: true }}
-    spaceBetween={30}
-    slidesPerView={1}
-    breakpoints={{
-      640: { slidesPerView: 1.2 },
-      768: { slidesPerView: 2 },
-      1024: { slidesPerView: 3 },
-    }}
-    className="pb-14"
-  >
-    {facilities.map((f, i) => (
-      <SwiperSlide key={i}>
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          whileHover={{ y: -12, scale: 1.05 }}
-          transition={{ type: "spring", stiffness: 180 }}
-          className="
-            group relative overflow-hidden
-            rounded-[26px] bg-white
-            shadow-[0_20px_40px_rgba(0,0,0,0.08)]
-            hover:shadow-[0_30px_60px_rgba(0,0,0,0.14)]
-            transition-all duration-500
-          "
-        >
-          {/* IMAGE WRAPPER */}
-          <div className="relative h-[260px] w-full overflow-hidden">
-            {/* Shimmer Loader */}
-            <div className="absolute inset-0 bg-slate-200 animate-pulse group-hover:opacity-0 transition" />
-
-            <img
-              src={f.img}
-              alt={f.title}
-              loading="lazy"
-              className="
-                h-full w-full object-cover
-                scale-105 group-hover:scale-110
-                transition-transform duration-700
-              "
-            />
-
-            {/* Gradient Overlay */}
-            <div className="
-              absolute inset-0
-              bg-gradient-to-t
-              from-black/50 via-black/20 to-transparent
-              opacity-0 group-hover:opacity-100
-              transition
-            " />
-          </div>
-
-          {/* CONTENT */}
-          <div className="relative p-6">
-            <h3 className="text-xl font-semibold text-slate-900 group-hover:text-blue-600 transition">
-              {f.title}
-            </h3>
-
-            <p className="mt-2 text-sm text-slate-600 opacity-0 group-hover:opacity-100 transition">
-              Secure • Reliable • Hospital-Grade
-            </p>
-
-            {/* Accent underline */}
-            <div className="mt-4 h-[2px] w-0 bg-blue-600 group-hover:w-16 transition-all duration-500" />
-          </div>
-        </motion.div>
-      </SwiperSlide>
-    ))}
-  </Swiper>
-</section>
-
-      
-
-      {/* ================= HOW IT WORKS ================= */}
-      <section className="bg-slate-100 py-24 px-6">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-bold mb-20 text-center">
-            How Video Consultation Works
+      {/* ================= CORE VALUE PILLARS ================= */}
+      <section className="py-28">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <h2 className="text-4xl font-bold mb-16">
+            Why Patients Trust Our Virtual Care
           </h2>
 
-          <div className="grid md:grid-cols-4 gap-10 text-center">
+          <div className="grid md:grid-cols-4 gap-12">
             {[
-              ["Choose Doctor", "https://cdn-icons-png.flaticon.com/512/387/387561.png"],
-              ["Schedule Visit", "https://cdn-icons-png.flaticon.com/512/2921/2921222.png"],
-              ["Video Consultation", "https://cdn-icons-png.flaticon.com/512/1687/1687828.png"],
-              ["Get Treatment", "https://cdn-icons-png.flaticon.com/512/2966/2966327.png"],
-            ].map(([title, icon], i) => (
-              <div key={title}>
-                <img src={icon} className="h-16 mx-auto mb-6" />
-                <h3 className="font-semibold text-lg">{title}</h3>
+              { icon: Video, title: "HD Video Consultations", desc: "Crystal-clear video & audio quality." },
+              { icon: ShieldCheck, title: "Secure & Private", desc: "HIPAA-compliant encrypted sessions." },
+              { icon: UserCheck, title: "Verified Specialists", desc: "Licensed & experienced physicians." },
+              { icon: Clock, title: "Save Time", desc: "No travel, no waiting rooms." },
+            ].map((item) => (
+              <div key={item.title}>
+                <item.icon className="h-12 w-12 text-blue-600 mx-auto" />
+                <h3 className="mt-6 text-xl font-semibold">{item.title}</h3>
+                <p className="mt-3 text-slate-600 text-sm">{item.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ================= DOCTORS ================= */}
-    <section className="py-28 bg-gradient-to-b from-slate-50 to-white">
-      <div className="max-w-7xl mx-auto px-6">
-        <h2 className="text-4xl md:text-5xl font-bold text-center mb-16">
-          Meet Our Specialists
-        </h2>
+      {/* ================= HOW IT WORKS ================= */}
+      {/* <section className="bg-slate-50 py-28">
+        <div className="max-w-7xl mx-auto px-6">
+          <h2 className="text-4xl font-bold text-center mb-20">
+            How Video Consultation Works
+          </h2>
 
-        <Swiper
-          modules={[Autoplay, Pagination, Navigation]}
-          loop
-          speed={1200}
-          autoplay={{
-            delay: 2500,
-            disableOnInteraction: false,
-            pauseOnMouseEnter: true
-          }}
-          pagination={{ clickable: true }}
-          navigation
-          spaceBetween={30}
-          slidesPerView={1}
-          breakpoints={{
-            640: { slidesPerView: 1.2 },
-            768: { slidesPerView: 2.2 },
-            1024: { slidesPerView: 3 }
-          }}
-          className="pb-16"
+          <div className="grid md:grid-cols-4 gap-14 text-center">
+            {[
+              "Choose a Doctor",
+              "Book a Slot",
+              "Join Video Call",
+              "Receive Prescription",
+            ].map((step, i) => (
+              <div key={step}>
+                <div className="h-14 w-14 mx-auto rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg">
+                  {i + 1}
+                </div>
+                <h3 className="mt-6 font-semibold text-lg">{step}</h3>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section> */}
+
+
+
+      {/* ================= HOW VIDEO CONSULTATION WORKS ================= */}
+<section className="py-32 bg-gradient-to-b from-slate-50 to-white">
+  <div className="max-w-6xl mx-auto px-6">
+
+    <motion.h2
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className="text-4xl font-bold text-center mb-24"
+    >
+      Your Video Consultation Journey
+    </motion.h2>
+
+    <div className="relative">
+
+      {/* Vertical Line */}
+      <div className="absolute left-1/2 top-0 h-full w-[2px] bg-blue-200 hidden md:block" />
+
+      {[
+        {
+          step: "01",
+          title: "Choose a Specialist",
+          desc: "Browse verified doctors and select the right specialist for your needs.",
+        },
+        {
+          step: "02",
+          title: "Book a Time Slot",
+          desc: "Pick a convenient date and time for your consultation.",
+        },
+        {
+          step: "03",
+          title: "Join Secure Video Call",
+          desc: "Connect instantly through our encrypted video platform.",
+        },
+        {
+          step: "04",
+          title: "Get Digital Prescription",
+          desc: "Receive medical advice and prescriptions immediately.",
+        },
+      ].map((item, i) => (
+        <motion.div
+          key={item.step}
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: i * 0.15 }}
+          className={`
+            relative mb-20 md:w-1/2
+            ${i % 2 === 0 ? "md:pr-16 md:text-right" : "md:pl-16 md:ml-auto"}
+          `}
         >
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <SwiperSlide key={i}>
+          {/* Step Circle */}
+          <div
+            className={`
+              absolute top-0
+              ${i % 2 === 0 ? "md:-right-[34px]" : "md:-left-[34px]"}
+              h-14 w-14 rounded-full
+              bg-blue-600 text-white
+              flex items-center justify-center
+              font-bold text-lg
+              shadow-lg
+            `}
+          >
+            {item.step}
+          </div>
+
+          {/* Card */}
+          <div className="bg-white rounded-2xl p-8 shadow-md hover:shadow-xl transition">
+            <h3 className="text-xl font-semibold mb-3">
+              {item.title}
+            </h3>
+            <p className="text-slate-600 text-sm leading-relaxed">
+              {item.desc}
+            </p>
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  </div>
+</section>
+
+
+
+
+      {/* ================= DOCTORS ================= */}
+      <section className="py-32">
+        <div className="max-w-7xl mx-auto px-6">
+          <h2 className="text-4xl md:text-5xl font-bold text-center mb-20">
+            Meet Our Medical Specialists
+          </h2>
+
+          <Swiper
+            modules={[Autoplay, Pagination, Navigation]}
+            loop
+            autoplay={{ delay: 3000 }}
+            pagination={{ clickable: true }}
+            navigation
+            spaceBetween={30}
+            breakpoints={{
+              640: { slidesPerView: 1.2 },
+              768: { slidesPerView: 2 },
+              1024: { slidesPerView: 3 },
+            }}
+          >
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <SwiperSlide key={i}>
+                <div className="overflow-hidden rounded-3xl shadow-lg bg-white">
+                  <img
+                    src={`https://randomuser.me/api/portraits/men/${i + 10}.jpg`}
+                    className="h-72 w-full object-cover"
+                    alt="Doctor"
+                  />
+                  <div className="p-6">
+                    <h3 className="text-lg font-semibold">Dr. Specialist {i}</h3>
+                    <p className="text-sm text-slate-600">Senior Consultant</p>
+                  </div>
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
+      </section>
+
+
+      {/* ================= INTERACTIVE VIDEO CONSULT EXPERIENCE ================= */}
+      <section className="py-32 bg-gradient-to-b from-white to-slate-50">
+        <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-20 items-center">
+
+          {/* LEFT CONTENT */}
+          <div>
+            <motion.h2
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-4xl font-bold mb-12"
+            >
+              A Smarter Way to Consult Doctors Online
+            </motion.h2>
+
+            {[
+              {
+                title: "Real-Time Doctor Interaction",
+                desc: "Face-to-face consultations with experienced specialists.",
+              },
+              {
+                title: "Hospital-Grade Security",
+                desc: "HIPAA-compliant, encrypted video sessions.",
+              },
+              {
+                title: "Instant Medical Guidance",
+                desc: "Prescriptions & advice during the same call.",
+              },
+            ].map((item, i) => (
               <motion.div
-                whileHover={{ y: -12, scale: 1.05 }}
+                key={item.title}
+                whileHover={{ x: 12 }}
                 transition={{ type: "spring", stiffness: 200 }}
                 className="
-                  relative overflow-hidden rounded-[28px]
-                  bg-white shadow-[0_20px_40px_rgba(0,0,0,0.08)]
+                  group relative mb-6 p-6 rounded-2xl
+                  bg-white border border-slate-200
+                  shadow-sm hover:shadow-xl
+                  cursor-pointer
                 "
               >
-                {/* Doctor Image */}
-                <img
-                  src={`https://randomuser.me/api/portraits/men/${i + 10}.jpg`}
-                  alt={`Dr Specialist ${i}`}
-                  className="h-72 w-full object-cover"
-                  loading="lazy"
-                />
+                <h3 className="text-xl font-semibold mb-2">
+                  {item.title}
+                </h3>
+                <p className="text-slate-600 text-sm">
+                  {item.desc}
+                </p>
 
-                {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-
-                {/* Content */}
-                <div className="absolute bottom-0 p-6 text-white">
-                  <h3 className="text-xl font-semibold">
-                    Dr. Specialist {i}
-                  </h3>
-                  <p className="text-sm opacity-90">
-                    Senior Consultant
-                  </p>
-
-                  {/* Availability */}
-                  <span className="inline-flex items-center mt-3 text-xs bg-green-500/90 px-3 py-1 rounded-full">
-                    <span className="mr-1">●</span> Available Online
-                  </span>
-                </div>
+                {/* Accent bar */}
+                <div className="absolute left-0 top-0 h-full w-1 bg-blue-600 rounded-l opacity-0 group-hover:opacity-100 transition" />
               </motion.div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </div>
-    </section>
+            ))}
+          </div>
+
+          {/* RIGHT VISUAL */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="relative"
+          >
+            {/* Main Video Card */}
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl">
+              <img
+                src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5"
+                className="w-full h-[420px] object-cover"
+              />
+
+              {/* Video UI Overlay */}
+              <div className="absolute inset-0 bg-black/25" />
+
+              <div className="absolute bottom-6 left-6 right-6 bg-white/95 backdrop-blur rounded-2xl p-4 flex items-center justify-between">
+                <div>
+                  <p className="font-semibold text-slate-900">
+                    Dr. Amanda Lewis
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    Internal Medicine
+                  </p>
+                </div>
+
+                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold">
+                  Live Call
+                </button>
+              </div>
+            </div>
+
+            {/* Floating Info */}
+            <motion.div
+              animate={{ y: [0, -10, 0] }}
+              transition={{ repeat: Infinity, duration: 5 }}
+              className="
+                absolute -top-8 -right-8
+                bg-white p-4 rounded-2xl
+                shadow-xl text-sm
+              "
+            >
+              🔒 Secure & Encrypted
+            </motion.div>
+          </motion.div>
+
+        </div>
+      </section>
 
       {/* ================= FINAL CTA ================= */}
       <section className="relative h-[420px]">
@@ -306,14 +319,14 @@ export default function VideoConsultPage() {
           src="https://images.unsplash.com/photo-1538108149393-fbbd81895907"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-blue-900/70" />
+        <div className="absolute inset-0 bg-blue-900/75" />
         <div className="absolute inset-0 flex items-center justify-center text-center text-white">
           <div>
             <h2 className="text-4xl font-bold mb-6">
               Healthcare Without Boundaries
             </h2>
             <p className="text-xl mb-10">
-              Access expert medical care anytime, anywhere.
+              Consult trusted doctors from the comfort of your home.
             </p>
             <button className="bg-white text-blue-900 px-12 py-4 rounded-lg font-semibold text-lg">
               Book Video Consultation

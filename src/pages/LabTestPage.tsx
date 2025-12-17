@@ -1,6 +1,7 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation } from "swiper/modules";
 import { motion } from "framer-motion";
+import lab_test from "../assets/images/lab_test2.png";
 
 import "swiper/css";
 import "swiper/css/navigation";
@@ -9,7 +10,7 @@ import "swiper/css/navigation";
 
 const slides = [
   {
-    image: "https://images.unsplash.com/photo-1581091870627-3c09a70a1f64",
+    image: lab_test,
     title: "Advanced Diagnostic Labs",
   },
   {
@@ -156,40 +157,69 @@ export default function LabTestPage() {
       </Section>
 
 
-      {/* ================= TESTIMONIALS ================= */}
-      <Section title="Thousands of Happy Customers">
-        <Swiper
-          loop
-          autoplay={{ delay: 3000, pauseOnMouseEnter: true }}
-          modules={[Autoplay]}
-          spaceBetween={20}
-          breakpoints={{
-            320: { slidesPerView: 1 },
-            768: { slidesPerView: 2 },
-          }}
-        >
+      {/* ================= WHY CHOOSE OUR LAB ================= */}
+      <Section title="Why Choose Our Diagnostic Labs" bg="bg-[#E6F4F3]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          
           {[
-            "Very accurate reports and fast service.",
-            "Home collection was smooth and safe.",
-            "Affordable and trusted diagnostics.",
-            "Best lab experience till date.",
-          ].map((t,i)=>(
-            <SwiperSlide key={i}>
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                className="bg-white p-6 rounded-xl shadow transition"
-              >
-                <p className="italic">“{t}”</p>
-              </motion.div>
-            </SwiperSlide>
+            {
+              title: "NABL & ISO Certified",
+              desc: "International quality standards ensuring accurate and reliable test results.",
+              icon: "🧪",
+            },
+            {
+              title: "Home Sample Collection",
+              desc: "Free and safe doorstep sample collection by trained professionals.",
+              icon: "🏠",
+            },
+            {
+              title: "Fast & Accurate Reports",
+              desc: "Most reports delivered within 24 hours with high precision.",
+              icon: "⏱️",
+            },
+            {
+              title: "Affordable Pricing",
+              desc: "Transparent pricing with no hidden charges.",
+              icon: "💰",
+            },
+            {
+              title: "Expert Pathologists",
+              desc: "Reports reviewed by experienced and certified medical experts.",
+              icon: "👨‍⚕️",
+            },
+            {
+              title: "Advanced Technology",
+              desc: "State-of-the-art lab equipment for accurate diagnostics.",
+              icon: "🔬",
+            },
+            {
+              title: "Secure Digital Reports",
+              desc: "Access your reports anytime through secure online systems.",
+              icon: "🔒",
+            },
+            {
+              title: "Wide Test Coverage",
+              desc: "1000+ diagnostic tests covering all major health conditions.",
+              icon: "📋",
+            },
+          ].map((item) => (
+            <motion.div
+              key={item.title}
+              whileHover={{ y: -10, scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 200 }}
+              className="bg-white p-6 rounded-2xl shadow-md hover:shadow-2xl transition"
+            >
+              <div className="text-4xl mb-4">{item.icon}</div>
+              <h3 className="font-bold text-lg mb-2">{item.title}</h3>
+              <p className="text-sm text-gray-600">{item.desc}</p>
+            </motion.div>
           ))}
-        </Swiper>
+        </div>
       </Section>
     </div>
   );
 }
 
-/* ================= REUSABLE ================= */
 
 function Section({
   title,

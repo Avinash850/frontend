@@ -14,26 +14,29 @@ export default function HeroSearchBar() {
   return (
     <form
       onSubmit={handleSearch}
-      className="d-flex flex-column flex-md-row gap-2 p-4 bg-white shadow-lg rounded-3 position-relative"
+      className="d-flex flex-column flex-lg-row gap-2 p-3 p-md-4 
+        bg-white shadow-lg rounded-3 position-relative"
     >
-      {/* Location Input */}
+      {/* Location */}
       <div className="position-relative flex-fill">
         <input
           type="text"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
           placeholder="Enter city or area"
-          className="form-control"
+          className="form-control form-control-lg"
         />
+
         {locationSuggestions.length > 0 && (
-          <ul className="list-group position-absolute w-100 mt-1 shadow-sm z-10">
+          <ul
+            className="list-group position-absolute w-100 mt-1 shadow z-3"
+            style={{ maxHeight: "220px", overflowY: "auto" }}
+          >
             {locationSuggestions.map((loc) => (
               <li
                 key={loc.id}
-                className="list-group-item list-group-item-action"
-                onClick={() => {
-                  setLocation(loc.label);
-                }}
+                className="list-group-item list-group-item-action py-3"
+                onClick={() => setLocation(loc.label)}
               >
                 {loc.label}
               </li>
@@ -42,33 +45,37 @@ export default function HeroSearchBar() {
         )}
       </div>
 
-      {/* Search Input */}
+      {/* Query */}
       <div className="position-relative flex-fill">
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search for doctors, hospitals, clinics..."
-          className="form-control"
+          placeholder="Search doctors, hospitals..."
+          className="form-control form-control-lg"
         />
+
         {querySuggestions.length > 0 && (
-          <ul className="list-group position-absolute w-100 mt-1 shadow-sm z-10">
+          <ul
+            className="list-group position-absolute w-100 mt-1 shadow z-3"
+            style={{ maxHeight: "220px", overflowY: "auto" }}
+          >
             {querySuggestions.map((item, index) => (
               <li
                 key={item.id || index}
-                className="list-group-item list-group-item-action"
-                onClick={() => {
-                  setQuery(item.name);
-                }}
+                className="list-group-item list-group-item-action py-3"
+                onClick={() => setQuery(item.name)}
               >
-                {item.name} <small className="text-muted">({item.type})</small>
+                <div className="fw-semibold">{item.name}</div>
+                <small className="text-muted">{item.type}</small>
               </li>
             ))}
           </ul>
         )}
       </div>
 
-      <button type="submit" className="btn btn-primary px-4">
+      <button type="submit" className="btn btn-primary btn-lg 
+          w-100 w-lg-auto px-lg-4">
         Search
       </button>
     </form>

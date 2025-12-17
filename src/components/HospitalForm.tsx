@@ -3,6 +3,7 @@ import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 import MultiSelect from "./MultiSelect";
 import { hospitalService } from "../services/hospitalService";
+import { quillModules, quillFormats } from "@/editor/quillConfig";
 
 type Props = {
   mode: "add" | "edit";
@@ -67,7 +68,7 @@ useEffect(() => {
       slug: safe(initialData.slug),
       timing: safe(initialData.timing),
       short_description: safe(initialData.short_description),
-      about: safe(initialData.about),
+       about: typeof initialData.about === "string" ? initialData.about : "",
       phone_1: safe(initialData.phone_1),
       phone_2: safe(initialData.phone_2),
       website: safe(initialData.website),
@@ -331,10 +332,15 @@ useEffect(() => {
           />
         </div>
 
-        {/* ABOUT */}
         <div>
           <label className="block text-sm font-medium mb-1">About</label>
-          <ReactQuill value={form.about} onChange={(val) => setForm({ ...form, about: val })} />
+          <ReactQuill
+            key={form.id || "new"}
+            value={form.about || ""}
+            onChange={(val) => setForm({ ...form, about: val })}
+            modules={quillModules}
+            formats={quillFormats}
+          />
         </div>
 
         {/* SEO */}

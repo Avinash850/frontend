@@ -1,20 +1,22 @@
 import React from 'react';
 
 const ServiceCard = ({ icon, title, description }) => (
-    <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 text-center">
+    <div className="bg-white p-5 sm:p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 text-center">
         <div className="flex items-center justify-center h-16 w-16 rounded-full bg-indigo-100 mx-auto mb-4">
             {icon}
         </div>
-        <h3 className="text-xl font-semibold text-slate-800 mb-2">{title}</h3>
-        <p className="text-slate-600">{description}</p>
+        <h3 className="text-lg sm:text-xl font-semibold text-slate-800 mb-2">{title}</h3>
+        <p className="text-sm sm:text-base text-slate-600">{description}</p>
     </div>
 );
 
 const Services = () => (
-    <section className="py-16 bg-white">
-        <div className="container mx-auto px-6">
-            <h2 className="text-3xl font-bold text-center text-slate-800 mb-10">Our Core Services</h2>
-            <div className="grid md:grid-cols-3 gap-8">
+    <section className="py-12 sm:py-16 bg-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-2xl sm:text-3xl font-bold text-center text-slate-800 mb-8 sm:mb-10">
+                Our Core Services
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
                 <ServiceCard 
                     icon={<svg className="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>}
                     title="Instant Video Consultation"
