@@ -1,7 +1,0 @@
-[
-    { "label": "Dentist", "type": "speciality" },
-    { "label": "Gynaecologist/Obstetrician", "type": "speciality" },
-    { "label": "General Physician", "type": "speciality" },
-    { "label": "Dermatologist", "type": "speciality" },
-    { "label": "Ear-nose-throat (ent) Specialist", "type": "speciality" }
-]
