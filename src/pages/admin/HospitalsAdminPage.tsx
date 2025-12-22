@@ -54,7 +54,7 @@ const HospitalAdminPage: React.FC = () => {
   const filtered = useMemo(() => {
     const term = q.trim().toLowerCase();
     if (!term) return hospitals;
-    return hospitals.filter((h) => [h.name, h.slug].join(" ").toLowerCase().includes(term));
+    return hospitals.filter((h) => [h.name].join(" ").toLowerCase().includes(term));
   }, [q, hospitals]);
 
   const paginated = useMemo(() => {

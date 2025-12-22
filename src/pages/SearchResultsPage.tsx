@@ -1,111 +1,161 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from "react";
 
-const DoctorResultCard = ({ doctor }) => (
+/* ---------------- Doctor Card ---------------- */
+const DoctorResultCard = ({ doctor, citySlug }) => {
+  return (
     <div className="bg-white p-5 rounded-lg shadow-sm mb-6 flex flex-col sm:flex-row">
-        <div className="flex-shrink-0 mb-4 sm:mb-0 sm:mr-5 text-center">
-            <img src={doctor.image} alt={doctor.name} className="w-24 h-24 rounded-full mx-auto object-cover" />
+      <div className="flex-shrink-0 mb-4 sm:mb-0 sm:mr-5 text-center">
+        <img
+          src={doctor.image_url || "/default-doctor.png"}
+          alt={doctor.name}
+          className="w-24 h-24 rounded-full mx-auto object-cover"
+        />
+      </div>
+
+      <div className="flex-grow">
+        <h3 className="text-xl font-bold text-indigo-600 hover:underline">
+          <a href={`#/${citySlug}/doctor/${doctor.slug}`}>
+            {doctor.name}
+          </a>
+        </h3>
+
+        {doctor.specialization_name && (
+          <p className="text-slate-600">{doctor.specialization_name}</p>
+        )}
+
+        {doctor.experience_years && (
+          <p className="text-slate-500 text-sm mt-1">
+            {doctor.experience_years} years experience overall
+          </p>
+        )}
+
+        <div className="my-3 text-sm">
+          <p className="font-semibold">
+            {doctor.area_name}, {doctor.city_name}
+          </p>
+
+          {doctor.consultation_fee > 0 && (
+            <p className="mt-1">
+              <span className="font-semibold">
+                ₹{doctor.consultation_fee}
+              </span>{" "}
+              Consultation fee
+            </p>
+          )}
         </div>
-        <div className="flex-grow">
-            <h3 className="text-xl font-bold text-indigo-600 hover:underline">
-                <a href={`#/doctor/${doctor.slug}`}>{doctor.name}</a>
-            </h3>
-            <p className="text-slate-600">{doctor.specialty}</p>
-            <p className="text-slate-500 text-sm mt-1">{doctor.experience} years experience overall</p>
-            <div className="my-3 text-sm">
-                <p className="font-semibold">{doctor.practiceLocations[0].area}, {doctor.practiceLocations[0].city}</p>
-                <p className="text-slate-500">{doctor.practiceLocations[0].clinicName}</p>
-                <p className="mt-1">
-                    <span className="font-semibold">₹{doctor.practiceLocations[0].consultationFee}</span> Consultation fee at clinic
-                </p>
-            </div>
-            {doctor.satisfaction && (
-                 <div className="bg-green-100 text-green-800 text-sm font-semibold inline-flex items-center px-2.5 py-0.5 rounded-full">
-                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"></path></svg>
-                    {doctor.satisfaction}% ({doctor.reviewCount} stories)
-                </div>
-            )}
-        </div>
-        <div className="flex-shrink-0 mt-4 sm:mt-0 sm:ml-5 flex flex-col items-center justify-center">
-            <p className="text-green-600 font-semibold text-sm mb-2">Available Today</p>
-            <a href={`#/doctor/${doctor.slug}`} className="w-full sm:w-auto bg-indigo-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-indigo-700 transition duration-300 text-center">
-                Book Appointment
-            </a>
-        </div>
+      </div>
+
+      <div className="flex-shrink-0 mt-4 sm:mt-0 sm:ml-5 flex items-center">
+        <a
+          href={`#/${citySlug}/doctor/${doctor.slug}`}
+          className="bg-indigo-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-indigo-700 transition"
+        >
+          Book Appointment
+        </a>
+      </div>
     </div>
-);
+  );
+};
 
+/* ---------------- Search Results Page ---------------- */
+const SearchResultsPage = () => {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-const SearchResultsPage = ({ location, specialty }) => {
-    const [doctors, setDoctors] = useState([]);
-    const [loading, setLoading] = useState(true);
+  // hash format: #/delhi/gynecologist OR #/delhi/doctor/dr-abc
+  const hash = window.location.hash.replace(/^#\/?/, "");
+  const parts = hash.split("/");
 
-    useEffect(() => {
-        const fetchDoctors = async () => {
-            setLoading(true);
-            try {
-                const response = await fetch('/data/doctors.json');
-                const allDoctors = await response.json();
-                // Basic filtering logic - can be expanded
-                const filtered = allDoctors.filter(doc => 
-                    doc.specialty.toLowerCase().includes(specialty.replace(/-/g, ' '))
-                );
-                setDoctors(filtered);
-            } catch (error) {
-                console.error("Failed to fetch doctors:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchDoctors();
-    }, [location, specialty]);
+  const citySlug = parts[0];
+  const entity = parts[1];       // doctor | gynecologist | hospital
+  const slug = parts[2] || null; // profile slug (optional)
 
-    const formattedLocation = location.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-    const formattedSpecialty = specialty.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  const isProfilePage = entity === "doctor" && slug;
 
-    return (
-        <div className="bg-slate-100">
-            <div className="container mx-auto px-6 py-8">
-                {/* Search Bar and Filters */}
-                <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
-                    {/* Simplified search bar */}
-                    <div className="flex items-center border border-gray-300 rounded-lg">
-                        <input type="text" value={formattedLocation} className="p-2 w-1/3 border-r" readOnly/>
-                        <input type="text" value={formattedSpecialty} className="p-2 w-2/3" readOnly/>
-                    </div>
-                </div>
-                 <div className="bg-indigo-700 text-white p-3 rounded-lg shadow-sm mb-6 flex space-x-4">
-                    {/* Simplified filters */}
-                    <select className="bg-indigo-700 border-none focus:ring-0"><option>Gender</option></select>
-                    <select className="bg-indigo-700 border-none focus:ring-0"><option>Patient Stories</option></select>
-                    <select className="bg-indigo-700 border-none focus:ring-0"><option>Experience</option></select>
-                    <select className="bg-indigo-700 border-none focus:ring-0"><option>All Filters</option></select>
-                    <select className="bg-indigo-700 border-none focus:ring-0 ml-auto"><option>Sort By: Relevance</option></select>
-                </div>
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
 
-                <div className="flex flex-col lg:flex-row gap-8">
-                    {/* Left Column: Doctor List */}
-                    <div className="w-full lg:w-2/3">
-                        <h2 className="text-xl font-semibold text-slate-800 mb-4">{doctors.length} {formattedSpecialty}s available in {formattedLocation}</h2>
-                        {loading ? <p>Loading...</p> : doctors.map(doc => <DoctorResultCard key={doc.slug} doctor={doc} />)}
-                    </div>
+        const params = new URLSearchParams({
+          city: citySlug,
+          type: entity === "doctor" ? "doctor" : "specialization",
+          ...(slug ? { slug } : {}),
+          profile: isProfilePage ? "true" : "false"
+        });
 
-                    {/* Right Column: Map */}
-                    <div className="w-full lg:w-1/3">
-                        <div className="sticky top-24">
-                           <div className="bg-gray-300 h-96 rounded-lg flex items-center justify-center">
-                                <p className="text-slate-600">[Map Placeholder]</p>
-                           </div>
-                           <div className="bg-white p-4 rounded-lg shadow-sm mt-4 text-center">
-                                <h4 className="font-semibold">Need help?</h4>
-                                <p className="text-sm text-slate-600">Our team is here to assist you.</p>
-                                <button className="mt-2 w-full bg-slate-200 text-slate-800 font-semibold py-2 rounded-lg">Contact Us</button>
-                           </div>
-                        </div>
-                    </div>
-                </div>
+        const res = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/api/search/details?${params}`
+        );
+
+        const data = await res.json();
+
+        setItems(data.items || []);
+      } catch (e) {
+        console.error(e);
+        setError("Failed to load results");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (citySlug && entity) {
+      fetchData();
+    }
+  }, [citySlug, entity, slug]);
+
+  const formattedCity = citySlug
+    ?.replace(/-/g, " ")
+    .replace(/\b\w/g, (l) => l.toUpperCase());
+
+  const formattedEntity = entity
+    ?.replace(/-/g, " ")
+    .replace(/\b\w/g, (l) => l.toUpperCase());
+
+  return (
+    <div className="bg-slate-100 min-h-screen">
+      <div className="container mx-auto px-6 py-8">
+
+        {/* Header */}
+        <h1 className="text-2xl font-semibold text-slate-800 mb-6">
+          {formattedEntity} in {formattedCity}
+        </h1>
+
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Results */}
+          <div className="w-full lg:w-2/3">
+            {loading && <p>Loading...</p>}
+            {error && <p className="text-red-500">{error}</p>}
+
+            {!loading && items.length === 0 && (
+              <p>No results found</p>
+            )}
+
+            {!loading &&
+              items.map((doc) => (
+                <DoctorResultCard
+                  key={doc.id}
+                  doctor={doc}
+                  citySlug={citySlug}
+                />
+              ))}
+          </div>
+
+          {/* Sidebar */}
+          <div className="w-full lg:w-1/3">
+            <div className="sticky top-24">
+              <div className="bg-gray-300 h-96 rounded-lg flex items-center justify-center">
+                <p className="text-slate-600">[Map Placeholder]</p>
+              </div>
             </div>
+          </div>
         </div>
-    );
+
+      </div>
+    </div>
+  );
 };
 
 export default SearchResultsPage;

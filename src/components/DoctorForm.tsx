@@ -16,7 +16,7 @@ type Props = {
 const emptyForm = {
   id: null as number | null,
   name: "",
-  slug: "",
+  // slug: "",
   designation: "",
   short_description: "",
   description: "",
@@ -64,7 +64,7 @@ const DoctorForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
         ...f,
         id: initialData.id ?? null,
         name: initialData.name ?? "",
-        slug: initialData.slug ?? "",
+        // slug: initialData.slug ?? "",
         designation: initialData.designation ?? "",
         short_description: initialData.short_description ?? "",
         description: typeof initialData.description === "string" ? initialData.description : "",
@@ -142,7 +142,7 @@ const DoctorForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
 
     const payload: any = {
       name: form.name,
-      slug: form.slug || form.name.toLowerCase().replace(/\s+/g, "-"),
+      // slug: form.slug || form.name.toLowerCase().replace(/\s+/g, "-"),
       designation: form.designation,
       short_description: form.short_description,
       description: form.description,
@@ -190,14 +190,14 @@ const DoctorForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div>
+              {/* <div>
                 <label className="block text-sm font-medium mb-1">Slug</label>
                 <input
                   value={form.slug}
                   onChange={(e) => setForm({ ...form, slug: e.target.value })}
                   className="w-full px-3 py-2 border rounded-md"
                 />
-              </div>
+              </div> */}
 
               <div>
                 <label className="block text-sm font-medium mb-1">Designation</label>

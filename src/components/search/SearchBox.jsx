@@ -5,308 +5,207 @@ import { ImSpinner2 } from "react-icons/im";
 import { FaUserMd } from "react-icons/fa";
 import { MdLocalHospital, MdOutlineLocalPharmacy } from "react-icons/md";
 import { DoctorContext } from "../../context/DoctorContextProvider";
-import { getDoctorDetails } from "../../services/doctorsService";
-import { SearchIcon } from "../Icons";
+import { useNavigate } from "react-router-dom";
 
-const SearchBox = () => {
-  const autoSelectRef = useRef(false);
-
+const SearchBox = ({ disabled }) => {
+  const navigate = useNavigate();
   const {
-    setSelectedDetails,
-    setProfileData,
-    setHospitalData,
-    searchQuery,
-    setMixedData,
-    setSearchQuery,
-    profileData,
-    setClinicData,
     selectedLocation,
-    validateLocation,
+    searchQuery,
+    setSearchQuery,
   } = useContext(DoctorContext);
 
+  /* ===================== LOCAL UI STATE ===================== */
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState({
-    doctors: [],
-    hospitals: [],
-    clinics: [],
-    specializations: [],
-    services: [],
-    procedures: [],
-    symptoms: [],
-  });
-
+  const [results, setResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showList, setShowList] = useState(false);
-  const [selectedName, setSelectedName] = useState(null);
+  const [userTyping, setUserTyping] = useState(false);
+
   const dropdownRef = useRef(null);
 
-  const getDefaultSuggestions = () => {
-    const text = query.toLowerCase();
-
-    if (["do", "doc", "doct", "doctor"].some((w) => "doctor".startsWith(text))) {
-      return [
-        {
-          selectedLocation: selectedLocation || "Delhi",
-          id: null,
-          name: "Doctor",
-          type: "doctor",
-        },
-      ];
-    }
-
-    return [];
-  };
-
-  // useEffect(() =>{
-  //   if(!searchQuery) return;
-
-  //   setQuery(searchQuery)
-  // }, [searchQuery])
-  console.log("searchQuery---->", searchQuery)
-
-useEffect(() => {
-  const syncFromHash = () => {
-    const hash = window.location.hash;
-    const parts = hash.replace(/^#\/?/, "").split("/");
-    const type = parts[0];
-    const name = parts[2] ? decodeURIComponent(parts[2]) : null;
-
-    if (!type) return;
-
-    if (type === "doctor" && name) {
-      setSelectedName(name);
-      setQuery(name);
-    }
-
-    if (type === "specialization" && name) {
-      setSelectedName(null);
-      setQuery(name);
-    }
-  };
-
-  syncFromHash();
-  window.addEventListener("hashchange", syncFromHash);
-  return () => window.removeEventListener("hashchange", syncFromHash);
-}, []);
-
-  // ✅ Close dropdown on outside click
+  /* =========================================================
+     1️⃣ BREADCRUMB → SEARCH (ONE TIME ONLY)
+     ========================================================= */
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    if (!searchQuery) return;
+
+    setQuery(searchQuery);
+    setUserTyping(false);
+    setShowList(false);
+
+    // 🔑 prevent future overrides
+    setSearchQuery(null);
+  }, [searchQuery, setSearchQuery]);
+
+  /* ===================== HELPERS ===================== */
+  const getCitySlug = () => {
+    if (!selectedLocation) return "delhi";
+
+    if (typeof selectedLocation === "string") {
+      return selectedLocation.toLowerCase().replace(/\s+/g, "-");
+    }
+
+    if (typeof selectedLocation === "object") {
+      return (
+        selectedLocation.slug ||
+        selectedLocation.name?.toLowerCase().replace(/\s+/g, "-") ||
+        "delhi"
+      );
+    }
+
+    return "delhi";
+  };
+
+  /* ===================== CLOSE ON OUTSIDE CLICK ===================== */
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setShowList(false);
+        setUserTyping(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // ✅ Debounced search
+  /* ===================== FETCH SUGGESTIONS (USER ONLY) ===================== */
   useEffect(() => {
-    const delay = setTimeout(() => {
-      handleSearch();
-    }, 400);
-    return () => clearTimeout(delay);
-  }, [query]);
+    if (disabled) return;
+    if (!userTyping) return;
+    if (typeof query !== "string") return;
+    if (query.trim().length < 2) {
+      setResults([]);
+      return;
+    }
 
-  const findExactMatch = (query, results) => {
-    if (!query) return null;
+    const timer = setTimeout(fetchSuggestions, 300);
+    return () => clearTimeout(timer);
+  }, [query, userTyping, disabled]);
 
-    const q = query.trim().toLowerCase();
-
-    const allItems = [
-      ...results.doctors,
-      ...results.hospitals,
-      ...results.clinics,
-      ...results.specializations,
-      ...results.services,
-      ...results.procedures,
-      ...results.symptoms,
-    ];
-
-    const matches = allItems.filter(
-      (item) => item?.name?.trim().toLowerCase() === q
-    );
-
-    return matches.length === 1 ? matches[0] : null;
-  };
-
-  useEffect(() => {
-  if (!searchQuery) return;
-
-  setQuery(searchQuery);
-  // setSelectedName(null); // ✅ remove old doctor name
-  setShowList(true);
-
-  autoSelectRef.current = true;
-  handleSearch(searchQuery);
-}, [searchQuery]);
-
-
-
-  const handleSearch = async (overrideQuery = null) => {
-    const effectiveQuery = overrideQuery ?? query;
-
+  const fetchSuggestions = async () => {
     try {
       setIsLoading(true);
       const { data } = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/api/suggest?q=${effectiveQuery || ""}&location=${selectedLocation || 1}`
+        `${import.meta.env.VITE_API_BASE_URL}/api/suggest`,
+        { params: { q: query } }
       );
-
-      const newResults = !effectiveQuery.trim()
-        ? {
-            doctors: [],
-            hospitals: [],
-            clinics: [],
-            specializations: data?.specializations || [],
-            services: [],
-            procedures: [],
-            symptoms: [],
-          }
-        : {
-            doctors: data?.doctors || [],
-            hospitals: data?.hospitals || [],
-            clinics: data?.clinics || [],
-            specializations: data?.specializations || [],
-            services: data?.services || [],
-            procedures: data?.procedures || [],
-            symptoms: data?.symptoms || [],
-          };
-
-      setResults(newResults);
-
-      if (autoSelectRef.current && searchQuery) {
-        const matchedItem = findExactMatch(searchQuery, newResults);
-        if (matchedItem) {
-          handleSelect(matchedItem);
-        }
-        autoSelectRef.current = false;
-      }
-    } catch (error) {
-      console.error("handleSearch error:", error);
+      setResults(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("❌ suggest error:", err);
+      setResults([]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // ✅ When user selects a result
   const handleSelect = (item) => {
-    setSelectedName(item.name);
     setQuery(item.name);
-    setSelectedDetails({ id: item.id, type: item.type });
     setShowList(false);
-    handleViewProfile({ id: item.id, type: item.type, selectedLocation });
-  };
+    setUserTyping(false);
 
-  const handleViewProfile = async (payload) => {
-    try {
-      const res = await getDoctorDetails(payload);
+    const citySlug = getCitySlug();
 
-      if (!res) return;
-
-      if (res.type === "doctor" && res.meta.count === 1 && res.meta.single) {
-        setProfileData(res.items[0]);
-        const id = res.items[0].id;
-        const type = payload.type;
-        const nameSlug = encodeURIComponent(res.items[0].name);
-        window.location.hash = `/${type}/${id}/${nameSlug}`;
-
-        setSearchQuery(null);
-      }
-
-      if (res.type === "hospital" && res.meta.count === 1 && res.meta.single) {
-        setHospitalData(res.items[0]);
-        const id = res.items[0].id;
-        const type = payload.type;
-        const nameSlug = encodeURIComponent(res.items[0].name);
-        window.location.hash = `/${type}/${id}/${nameSlug}`;
-        setSearchQuery(null);
-      }
-
-      if (res.type === "clinic" && res.meta.count === 1 && res.meta.single) {
-        setClinicData(res.items[0]);
-        const id = res.items[0].id;
-        const type = payload.type;
-        const nameSlug = encodeURIComponent(res.items[0].name);
-        window.location.hash = `/${type}/${id}/${nameSlug}`;
-        setSearchQuery(null);
-      }
-
-      if (res.meta.single === false) {
-        setMixedData(res.related);
-        const nameSlug = encodeURIComponent(query);
-        window.location.hash = `/${payload.type}/${payload.id}/${nameSlug}`;
-        // setSearchQuery(null);
-      }
-    } catch (error) {
-      console.error("err->", error);
+    // 🔥 NEW: intent handling
+    if (item.type === "intent") {
+      navigate(`/${citySlug}/${item.slug}`);
+      return;
     }
-  };
 
-  const highlightText = (text) => {
-    if (!query) return text;
-    const regex = new RegExp(`(${query})`, "gi");
-    return text.split(regex).map((part, i) =>
-      part.toLowerCase() === query.toLowerCase() ? (
-        <span key={i} className="font-semibold text-blue-600">
-          {part}
-        </span>
-      ) : (
-        part
-      )
-    );
-  };
+    if (["doctor", "hospital", "clinic"].includes(item.type)) {
+      navigate(`/${citySlug}/${item.type}/${item.slug}`);
+    } else {
+      navigate(`/${citySlug}/${item.slug}`);
+    }
+};
 
-  const renderSection = (title, items, icon, colorClass) => {
+
+  const handleKeyDown = (e) => {
+  if (e.key !== "Enter") return;
+  if (!query.trim()) return;
+
+  e.preventDefault();
+  setShowList(false);
+  setUserTyping(false);
+
+  const citySlug = getCitySlug();
+  const keyword = query.toLowerCase().trim();
+
+  // 🔥 INTENT FIRST
+  if (["do", "doc", "doctor", "doctors"].includes(keyword)) {
+    navigate(`/${citySlug}/doctors`);
+    return;
+  }
+
+  if (["hos", "hospital", "hospitals"].includes(keyword)) {
+    navigate(`/${citySlug}/hospitals`);
+    return;
+  }
+
+  if (["cli", "clinic", "clinics"].includes(keyword)) {
+    navigate(`/${citySlug}/clinics`);
+    return;
+  }
+
+  // fallback → keyword search
+  navigate(`/${citySlug}/${keyword.replace(/\s+/g, "-")}`);
+};
+
+
+  /* ===================== RENDER HELPERS ===================== */
+  const byType = (type) => results.filter((r) => r.type === type);
+
+  const renderItem = (item, icon) => (
+    <div
+      key={`${item.type}-${item.slug}`}
+      onClick={() => handleSelect(item)}
+      className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer"
+    >
+      {icon}
+      <span>{item.name}</span>
+    </div>
+  );
+
+  const renderSection = (title, items, icon) => {
     if (!items.length) return null;
     return (
-      <div className="mb-2">
-        <div className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 rounded-t-lg">
-          <span className={colorClass}>{icon}</span> {title}
+      <>
+        <div className="px-4 py-2 text-sm font-semibold bg-gray-100">
+          {title}
         </div>
-        <ul className="divide-y divide-gray-100">
-          {items.map((item) => (
-            <li
-              key={`${item.type}-${item.id || item.name}`}
-              onClick={() => handleSelect(item)}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-all"
-            >
-              {item.type === "doctor" && (
-                <FaUserMd className="text-blue-500 text-lg" />
-              )}
-              {item.type === "clinic" && (
-                <MdOutlineLocalPharmacy className="text-green-500 text-lg" />
-              )}
-              {item.type === "hospital" && (
-                <MdLocalHospital className="text-red-500 text-lg" />
-              )}
-              <span className="text-gray-800 text-[15px]">
-                {highlightText(item.name)}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </div>
+        {items.map((item) => renderItem(item, icon))}
+      </>
     );
   };
 
+  /* ===================== UI ===================== */
   return (
-    <div className="relative w-full max-w-lg mx-auto" ref={dropdownRef}>
-      <div className="flex items-center bg-white border border-gray-300 rounded-full shadow-sm px-4">
+    <div className="relative w-full md:max-w-lg mx-auto" ref={dropdownRef}>
+      <div className="flex items-center bg-white border border-gray-300 rounded-full px-4">
         {isLoading ? (
           <ImSpinner2 className="animate-spin text-blue-500 mr-3" />
         ) : (
-          <FiSearch className="text-gray-500 mr-3" size={20} />
+          <FiSearch className="text-gray-500 mr-3" size={18} />
         )}
+
         <input
           type="text"
           value={query}
-          onFocus={() => setShowList(true)}
+          disabled={disabled}
+          onFocus={() => {
+            setShowList(true);
+            setUserTyping(true);
+          }}
           onChange={(e) => {
             setQuery(e.target.value);
-            setSelectedName(null);
+            setUserTyping(true);
+            setShowList(true);
           }}
-          placeholder="Search for doctors, clinics, or specializations"
-          className="flex-1 py-3 bg-transparent outline-none text-gray-700"
+          onKeyDown={handleKeyDown}
+          placeholder="Search doctors, clinics, specializations"
+          // className="flex-1 py-3 bg-transparent outline-none text-gray-700"
+          className="flex-1 py-2.5 md:py-3 bg-transparent outline-none text-gray-700 text-sm md:text-base"
         />
       </div>
 
@@ -316,63 +215,15 @@ useEffect(() => {
             <div className="flex justify-center items-center py-6 text-gray-500">
               <ImSpinner2 className="animate-spin mr-2" /> Searching...
             </div>
-          ) : !query.trim() ? (
-            renderSection(
-              "Specializations",
-              results.specializations,
-              <FaUserMd />,
-              "text-blue-500"
-            )
           ) : (
             <>
-              {renderSection(
-                "",
-                getDefaultSuggestions(),
-                <SearchIcon />,
-                "text-blue-500"
-              )}
-              {renderSection(
-                "Doctors",
-                results.doctors,
-                <FaUserMd />,
-                "text-blue-500"
-              )}
-              {renderSection(
-                "Hospitals",
-                results.hospitals,
-                <MdLocalHospital />,
-                "text-red-500"
-              )}
-              {renderSection(
-                "Clinics",
-                results.clinics,
-                <MdOutlineLocalPharmacy />,
-                "text-green-500"
-              )}
-              {renderSection(
-                "Specializations",
-                results.specializations,
-                <FaUserMd />,
-                "text-purple-500"
-              )}
-              {renderSection(
-                "Services",
-                results.services,
-                <MdOutlineLocalPharmacy />,
-                "text-indigo-500"
-              )}
-              {renderSection(
-                "Procedures",
-                results.procedures,
-                <MdOutlineLocalPharmacy />,
-                "text-amber-500"
-              )}
-              {renderSection(
-                "Symptoms",
-                results.symptoms,
-                <FaUserMd />,
-                "text-rose-500"
-              )}
+             {renderSection("Search for", byType("intent"), <FiSearch />)}
+              {renderSection("Specializations", byType("specialization"), <FaUserMd />)}
+              {renderSection("Doctors", byType("doctor"), <FaUserMd />)}
+              {renderSection("Hospitals", byType("hospital"), <MdLocalHospital />)}
+              {renderSection("Clinics", byType("clinic"), <MdOutlineLocalPharmacy />)}
+              {renderSection("Services", byType("service"), <MdOutlineLocalPharmacy />)}
+              {renderSection("Symptoms", byType("symptom"), <FaUserMd />)}
             </>
           )}
         </div>

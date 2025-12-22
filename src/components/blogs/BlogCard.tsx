@@ -1,6 +1,11 @@
+import { useNavigate } from "react-router-dom";
+
+
 const BlogCard = ({ blog }: any) => {
+  const navigate = useNavigate();
+
   const openBlog = () => {
-    window.location.hash = `#/blogs/${blog.slug}`;
+    navigate(`/blogs/${blog.slug}`);
   };
 
   return (

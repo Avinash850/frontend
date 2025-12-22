@@ -15,7 +15,7 @@ type Props = {
 const emptyForm = {
   id: null as number | null,
   name: "",
-  slug: "",
+  // slug: "",
   timing: "",
   short_description: "",
   about: "",
@@ -63,7 +63,7 @@ const ClinicForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
         ...emptyForm,
         id: initialData.id,
         name: safe(initialData.name),
-        slug: safe(initialData.slug),
+        // slug: safe(initialData.slug),
         timing: safe(initialData.timing),
         short_description: safe(initialData.short_description),
         about: safe(initialData.about),
@@ -78,11 +78,31 @@ const ClinicForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
         imagePreview: safe(initialData.image_url),
         city_id: safe(initialData.city_id),
         area_id: safe(initialData.area_id),
-        specializations: initialData.specializations || [],
-        services: initialData.services || [],
-        procedures: initialData.procedures || [],
-        symptoms: initialData.symptoms || [],
-        doctors: initialData.doctors || [],
+        // specializations: initialData.specializations || [],
+        // services: initialData.services || [],
+        // procedures: initialData.procedures || [],
+        // symptoms: initialData.symptoms || [],
+        // doctors: initialData.doctors || [],
+        specializations: Array.isArray(initialData.specializations)
+          ? initialData.specializations.map((s: any) => typeof s === "object" ? s.id : s)
+          : [],
+
+        services: Array.isArray(initialData.services)
+          ? initialData.services.map((s: any) => typeof s === "object" ? s.id : s)
+          : [],
+
+        procedures: Array.isArray(initialData.procedures)
+          ? initialData.procedures.map((p: any) => typeof p === "object" ? p.id : p)
+          : [],
+
+        symptoms: Array.isArray(initialData.symptoms)
+          ? initialData.symptoms.map((s: any) => typeof s === "object" ? s.id : s)
+          : [],
+
+        doctors: Array.isArray(initialData.doctors)
+          ? initialData.doctors.map((d: any) => typeof d === "object" ? d.id : d)
+          : [],
+
       });
     }
   }, [initialData, mode]);
@@ -123,12 +143,47 @@ const ClinicForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
   const handleSubmit = async () => {
     const payload = new FormData();
 
-    Object.entries(form).forEach(([k, v]: any) => {
-      if (Array.isArray(v)) payload.append(k, csv(v));
-      else if (v !== null) payload.append(k, String(v));
-    });
+    // Object.entries(form).forEach(([k, v]: any) => {
+    //   if (Array.isArray(v)) payload.append(k, csv(v));
+    //   else if (v !== null) payload.append(k, String(v));
+    // });
 
-    if (form.imageFile) payload.append("image", form.imageFile);
+    // if (form.imageFile) payload.append("image", form.imageFile);
+    payload.append("name", form.name);
+payload.append("timing", form.timing);
+payload.append("short_description", form.short_description);
+payload.append("about", form.about);
+payload.append("phone_1", form.phone_1);
+payload.append("phone_2", form.phone_2);
+payload.append("website", form.website);
+payload.append("address", form.address);
+payload.append("seo_title", form.seo_title);
+payload.append("seo_keywords", form.seo_keywords);
+payload.append("seo_description", form.seo_description);
+payload.append("json_schema", form.json_schema);
+
+if (form.city_id) payload.append("city_id", String(form.city_id));
+if (form.area_id) payload.append("area_id", String(form.area_id));
+
+if (form.specializations.length)
+  payload.append("specializations", form.specializations.join(","));
+
+if (form.services.length)
+  payload.append("services", form.services.join(","));
+
+if (form.procedures.length)
+  payload.append("procedures", form.procedures.join(","));
+
+if (form.symptoms.length)
+  payload.append("symptoms", form.symptoms.join(","));
+
+if (form.doctors.length)
+  payload.append("doctors", form.doctors.join(","));
+
+if (form.imageFile)
+  payload.append("image", form.imageFile);
+
+    
 
     if (mode === "add") await clinicService.createClinic(payload);
     else await clinicService.updateClinic(form.id!, payload);
@@ -154,14 +209,14 @@ const ClinicForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div>
+              {/* <div>
                 <label className="block text-sm font-medium mb-1">Slug</label>
                 <input
                   value={form.slug}
                   onChange={e => setForm({ ...form, slug: e.target.value })}
                   className="w-full px-3 py-2 border rounded-md"
                 />
-              </div>
+              </div> */}
 
               <div>
                 <label className="block text-sm font-medium mb-1">Timing</label>

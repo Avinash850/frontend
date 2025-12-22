@@ -15,7 +15,7 @@ type Props = {
 const emptyForm = {
   id: null,
   name: "",
-  slug: "",
+  // slug: "",
   timing: "",
   short_description: "",
   about: "",
@@ -65,7 +65,7 @@ useEffect(() => {
       ...emptyForm,
       id: initialData.id,
       name: safe(initialData.name),
-      slug: safe(initialData.slug),
+      // slug: safe(initialData.slug),
       timing: safe(initialData.timing),
       short_description: safe(initialData.short_description),
        about: typeof initialData.about === "string" ? initialData.about : "",
@@ -155,7 +155,7 @@ useEffect(() => {
 
     const payload = new FormData();
     payload.append("name", form.name);
-    payload.append("slug", form.slug || form.name.toLowerCase().replace(/\s+/g, "-"));
+    // payload.append("slug", form.slug || form.name.toLowerCase().replace(/\s+/g, "-"));
     payload.append("timing", form.timing || "");
     payload.append("short_description", form.short_description || "");
     payload.append("about", form.about || "");
@@ -209,14 +209,14 @@ useEffect(() => {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div>
+              {/* <div>
                 <label className="block text-sm font-medium mb-1">Slug</label>
                 <input
                   value={form.slug}
                   onChange={(e) => setForm({ ...form, slug: e.target.value })}
                   className="w-full px-3 py-2 border rounded-md"
                 />
-              </div>
+              </div> */}
 
               <div>
                 <label className="block text-sm font-medium mb-1">Timing</label>

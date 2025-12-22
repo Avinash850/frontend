@@ -55,17 +55,49 @@ export const getDoctorSuggestions = async (query: string, location?: string) => 
   }
 };
 
-export const getDoctorDetails = async (payl) => {
-  // console.log("payl details -:", payl)
+
+
+export const getDoctorDetails = async (payload) => {
+  try {
+    const { data } = await API.get("/api/search/details", {
+      params: {
+        type: payload.type,        // doctor
+        slug: payload.slug,        // dr-mona-dahiya-...
+        city: payload.city,        // delhi
+        profile: true              // 👈 REQUIRED
+      }
+    });
+    return data;
+  } catch (error) {
+    console.error("❌ Error fetching doctor details:", error);
+    throw error;
+  }
+};
+
+// //  intent based search (keyword → doctors)
+  export const searchByIntent = async ({
+    keyword,
+    city,
+    area,
+    limit = 20,
+  }) => {
     try {
-      const { data } = await API.get(`${import.meta.env.VITE_API_BASE_URL}/api/search/details`, {
-        params: {id: payl.id, type: payl.type, location: payl.selectedLocation}
-      });
-      // console.log("details===>", data)
+      const { data } = await API.get(
+        "/api/search/intent",
+        {
+          params: {
+            q: keyword,
+            city,
+            area,
+            limit,
+          },
+        }
+      );
+
       return data;
     } catch (error) {
-      console.error("❌ Error fetching doctor details:", error);
-    throw error;
+      console.error("❌ Error in searchByIntent:", error);
+      throw error;
     }
   };
 

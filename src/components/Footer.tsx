@@ -51,8 +51,8 @@ const Footer = () => {
                 <div className="mt-12 pt-8 border-t border-slate-700 text-center text-sm text-slate-400">
                      <p>&copy; {new Date().getFullYear()} Prega Journey. All rights reserved.</p>
                      <div className="mt-4 space-x-6">
-                        <button onClick={() => window.location.hash = '#/terms'} className="bg-transparent border-none p-0 cursor-pointer text-slate-400 hover:text-white">Terms of Service</button>
-                        <button onClick={() => window.location.hash = '#/privacy'} className="bg-transparent border-none p-0 cursor-pointer text-slate-400 hover:text-white">Privacy Policy</button>
+                        <button onClick={() => window.location.hash = '/terms'} className="bg-transparent border-none p-0 cursor-pointer text-slate-400 hover:text-white">Terms of Service</button>
+                        <button onClick={() => window.location.hash = '/privacy'} className="bg-transparent border-none p-0 cursor-pointer text-slate-400 hover:text-white">Privacy Policy</button>
                      </div>
                 </div>
             </div>
