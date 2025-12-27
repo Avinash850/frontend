@@ -32,16 +32,23 @@ const HospitalAdminPage: React.FC = () => {
   const [loadingEdit, setLoadingEdit] = useState(false);
 
   const [q, setQ] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
 
-  const loadData = async () => {
-    try {
-      const res = await hospitalService.getHospitals();
-      setHospitals(Array.isArray(res) ? res : []);
-    } catch (e) {
-      console.error("Failed to load hospitals", e);
-      setHospitals([]);
-    }
-  };
+
+const loadData = async () => {
+  try {
+    const res = await hospitalService.getHospitals({
+      from_date: fromDate || undefined,
+      to_date: toDate || undefined,
+    });
+    setHospitals(Array.isArray(res) ? res : []);
+  } catch (e) {
+    console.error("Failed to load hospitals", e);
+    setHospitals([]);
+  }
+};
+
 
   useEffect(() => {
     loadData();
@@ -130,6 +137,39 @@ const HospitalAdminPage: React.FC = () => {
                 </button>
               )}
             </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="date"
+                value={fromDate}
+                onChange={(e) => setFromDate(e.target.value)}
+                className="px-3 py-2 border rounded-md"
+              />
+
+              <input
+                type="date"
+                value={toDate}
+                onChange={(e) => setToDate(e.target.value)}
+                className="px-3 py-2 border rounded-md"
+              />
+
+              <button
+                onClick={loadData}
+                className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                Filter
+              </button>
+               
+                <button
+                  onClick={() => {
+                    setFromDate("");
+                    setToDate("");
+                  }}
+                  className="text-sm text-gray-500"
+                >
+                  Clear
+                </button>
+            </div>
+
 
             <button
               onClick={handleOpenNew}

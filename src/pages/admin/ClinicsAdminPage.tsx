@@ -37,9 +37,16 @@ const ClinicAdminPage: React.FC = () => {
 
   const [q, setQ] = useState("");
 
+  /* ===== DATE FILTER (ADDED) ===== */
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+
   const loadData = async () => {
     try {
-      const res = await clinicService.getClinics();
+      const res = await clinicService.getClinics({
+        from_date: fromDate || undefined,
+        to_date: toDate || undefined,
+      });
       setClinics(Array.isArray(res) ? res : []);
     } catch (e) {
       console.error("Failed to load clinics", e);
@@ -49,7 +56,7 @@ const ClinicAdminPage: React.FC = () => {
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [fromDate, toDate]);
 
   useEffect(() => {
     setPage(1);
@@ -74,7 +81,6 @@ const ClinicAdminPage: React.FC = () => {
     setOpenNew(true);
   };
 
-  // ✅ SAME FIX AS HOSPITAL
   const handleOpenEdit = async (item: any) => {
     try {
       setEditItem(null);
@@ -84,7 +90,6 @@ const ClinicAdminPage: React.FC = () => {
 
       setEditItem(data);
 
-      // allow state to settle before opening modal
       setTimeout(() => {
         setOpenEdit(true);
         setLoadingEdit(false);
@@ -125,6 +130,20 @@ const ClinicAdminPage: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-3">
+            {/* DATE FILTER (ADDED) */}
+            <input
+              type="date"
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
+              className="px-3 py-2 border rounded-md"
+            />
+            <input
+              type="date"
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
+              className="px-3 py-2 border rounded-md"
+            />
+
             <div className="relative">
               <input
                 value={q}

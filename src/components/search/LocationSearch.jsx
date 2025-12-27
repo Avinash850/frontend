@@ -14,8 +14,7 @@ const LocationSearch = ({ disabled }) => {
     setLocationQuery,
   } = useContext(DoctorContext);
 
-  /* ===================== LOCAL UI STATE ===================== */
-  const [query, setQuery] = useState(""); // display text ONLY
+  const [query, setQuery] = useState("");
   const [locations, setLocations] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showList, setShowList] = useState(false);
@@ -23,27 +22,20 @@ const LocationSearch = ({ disabled }) => {
 
   const dropdownRef = useRef(null);
 
-  /* =========================================================
-     1️⃣ AUTO-FILL CITY (ONLY ON FIRST LOAD)
-     ========================================================= */
+  /* ===================== SYNC INPUT WITH CONTEXT ===================== */
   useEffect(() => {
-    if (userTyping) return;
-    if (!query && typeof selectedLocation === "string") {
+    if (!userTyping && selectedLocation) {
       setQuery(selectedLocation);
     }
-  }, [selectedLocation]); // intentionally NOT depending on query
+  }, [selectedLocation]);
 
-  /* =========================================================
-     2️⃣ BREADCRUMB → LOCATION (ONE-TIME ONLY)
-     ========================================================= */
+  /* ===================== BREADCRUMB SUPPORT ===================== */
   useEffect(() => {
     if (!locationQuery) return;
 
-    setQuery(locationQuery);      // display text only
+    setQuery(locationQuery);
     setUserTyping(false);
     setShowList(false);
-
-    // 🔑 clear immediately → prevents global override
     setLocationQuery(null);
   }, [locationQuery, setLocationQuery]);
 
@@ -59,32 +51,26 @@ const LocationSearch = ({ disabled }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  /* ===================== FETCH LOCATIONS (USER ONLY) ===================== */
+  /* ===================== FETCH LOCATIONS ===================== */
   useEffect(() => {
     if (disabled) return;
     if (!userTyping) return;
-    if (typeof query !== "string") return;
     if (query.trim().length < 2) return;
 
     const timer = setTimeout(fetchLocations, 350);
     return () => clearTimeout(timer);
   }, [query, userTyping, disabled]);
 
-  /* ===================== API ===================== */
   const fetchLocations = async () => {
     try {
       setIsLoading(true);
-
       const { data } = await axios.get(
         `${import.meta.env.VITE_API_BASE_URL}/api/locations/suggest`,
         { params: { q: query } }
       );
 
       const results = data?.results || {};
-      setLocations([
-        ...(results.areas || []),
-        ...(results.cities || []),
-      ]);
+      setLocations([...(results.areas || []), ...(results.cities || [])]);
     } catch (err) {
       console.error("❌ Location search error:", err);
       setLocations([]);
@@ -95,19 +81,16 @@ const LocationSearch = ({ disabled }) => {
 
   /* ===================== SELECT LOCATION ===================== */
   const handleSelect = (item) => {
-    setSelectedLocation({
-      city_id: item.location_level === "city" ? item.id : item.city_id,
-      area_id: item.location_level === "area" ? item.id : null,
-    });
+    const cityName = item.name;
 
-    // ✅  behavior: ONLY name in input
-    setQuery(item.name);
+    setSelectedLocation(cityName);
+    localStorage.setItem("selected_city", cityName);
 
+    setQuery(cityName);
     setShowList(false);
     setUserTyping(false);
   };
 
-  /* ===================== UI ===================== */
   return (
     <div className="relative w-full max-w-md mx-auto" ref={dropdownRef}>
       <div

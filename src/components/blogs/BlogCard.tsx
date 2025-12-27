@@ -5,7 +5,8 @@ const BlogCard = ({ blog }: any) => {
   const navigate = useNavigate();
 
   const openBlog = () => {
-    navigate(`/blogs/${blog.slug}`);
+    // navigate(`/blogs/${blog.slug}`);
+    window.location.href = `/blogs/${blog.slug}`;
   };
 
   return (

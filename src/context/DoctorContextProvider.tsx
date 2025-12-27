@@ -1,5 +1,4 @@
-import React, { createContext, useState, ReactNode } from "react";
-import { useEffect } from "react";
+import React, { createContext, useState, ReactNode, useEffect } from "react";
 
 /* ===================== Types ===================== */
 
@@ -10,11 +9,9 @@ export interface Doctor {
 }
 
 interface DoctorContextType {
-  /* ---------- Selected search item ---------- */
   selectedDetails: Doctor | null;
   setSelectedDetails: React.Dispatch<React.SetStateAction<Doctor | null>>;
 
-  /* ---------- Doctor / Hospital / Clinic profiles ---------- */
   profileData: any;
   setProfileData: React.Dispatch<React.SetStateAction<any>>;
 
@@ -27,6 +24,7 @@ interface DoctorContextType {
   mixedData: any;
   setMixedData: React.Dispatch<React.SetStateAction<any>>;
 
+  /* 🔑 CITY NAME ONLY */
   selectedLocation: string | null;
   setSelectedLocation: React.Dispatch<React.SetStateAction<string | null>>;
 
@@ -56,63 +54,32 @@ interface DoctorContextProviderProps {
 export default function DoctorContextProvider({
   children,
 }: DoctorContextProviderProps) {
-  /* ---------- Search selection ---------- */
   const [selectedDetails, setSelectedDetails] = useState<Doctor | null>(null);
 
-  /* ---------- Profiles ---------- */
   const [profileData, setProfileData] = useState<any>(null);
   const [hospitalData, setHospitalData] = useState<any>(null);
   const [clinicData, setClinicData] = useState<any>(null);
   const [mixedData, setMixedData] = useState<any>(null);
 
-  /* ---------- Location (ONLY for search pages) ---------- */
-  const [selectedLocation, setSelectedLocation] = useState<string | null>("Delhi");
+  /* 🔥 IMPORTANT: start with NULL, not Delhi */
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
   const [locationError, setLocationError] = useState(false);
 
-    useEffect(() => {
-  // 1️⃣ If already stored → use it
-  const savedLocation = localStorage.getItem("selected_city");
-  if (savedLocation) {
-    setSelectedLocation(savedLocation);
-    return;
-  }
+  /* ===================== LOAD SAVED CITY (ONCE) ===================== */
+  useEffect(() => {
+    const savedCity = localStorage.getItem("selected_city");
 
-  // 2️⃣ Try browser location (best effort)
-  if (!navigator.geolocation) {
-    setSelectedLocation("Delhi");
-    localStorage.setItem("selected_city", "Delhi");
-    return;
-  }
-
-  navigator.geolocation.getCurrentPosition(
-    async (position) => {
-      try {
-        const { latitude, longitude } = position.coords;
-
-        // OPTIONAL: reverse geocoding (later)
-        // For now → default to Delhi
-        const detectedCity = "Delhi";
-
-        setSelectedLocation(detectedCity);
-        localStorage.setItem("selected_city", detectedCity);
-      } catch {
-        setSelectedLocation("Delhi");
-        localStorage.setItem("selected_city", "Delhi");
-      }
-    },
-    () => {
-      // Permission denied / error
-      setSelectedLocation("Delhi");
+    if (savedCity) {
+      setSelectedLocation(savedCity);
+    } else {
+      setSelectedLocation("Delhi"); // default ONLY first time
       localStorage.setItem("selected_city", "Delhi");
     }
-  );
-}, []);
+  }, []);
 
-  /* ---------- Breadcrumb triggers ---------- */
   const [locationQuery, setLocationQuery] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
 
-  /* ---------- Helpers ---------- */
   const validateLocation = () => {
     if (!selectedLocation) {
       setLocationError(true);
@@ -121,12 +88,6 @@ export default function DoctorContextProvider({
     setLocationError(false);
     return true;
   };
-
-  /* ---------- IMPORTANT: NO URL LOGIC HERE ---------- */
-  /*  rule:
-     - Context is ONLY for search
-     - Profiles must NOT depend on context
-  */
 
   const value: DoctorContextType = {
     selectedDetails,

@@ -37,12 +37,17 @@ const DoctorsAdminPage: React.FC = () => {
   const [editItem, setEditItem] = useState<any>(null);
   const [viewItem, setViewItem] = useState<any>(null);
 
-  // Search
+  // search + date filter
   const [q, setQ] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
 
   const loadData = async () => {
     try {
-      const res = await doctorService.getDoctors();
+      const res = await doctorService.getDoctors({
+        from_date: fromDate || undefined,
+        to_date: toDate || undefined,
+      });
       const list = Array.isArray(res?.data) ? res.data : res || [];
       setDoctors(list);
     } catch (e) {
@@ -55,6 +60,12 @@ const DoctorsAdminPage: React.FC = () => {
     loadData();
   }, []);
 
+  // reload on date change
+  useEffect(() => {
+    setPage(1);
+    loadData();
+  }, [fromDate, toDate]);
+
   // reset page on search
   useEffect(() => {
     setPage(1);
@@ -64,7 +75,9 @@ const DoctorsAdminPage: React.FC = () => {
   const filtered = useMemo(() => {
     const term = q.trim().toLowerCase();
     if (!term) return doctors;
-    return doctors.filter((d: any) => [d.name, d.slug].join(" ").toLowerCase().includes(term));
+    return doctors.filter((d: any) =>
+      [d.name, d.slug].join(" ").toLowerCase().includes(term)
+    );
   }, [q, doctors]);
 
   // Paginated
@@ -75,24 +88,26 @@ const DoctorsAdminPage: React.FC = () => {
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / limit));
 
-  // Create doctor open
-  const handleOpenNew = () => {
-    setOpenNew(true);
-  };
+  const handleOpenNew = () => setOpenNew(true);
 
-  // Edit open
   const handleOpenEdit = (item: any) => {
     setEditItem(item);
     setOpenEdit(true);
   };
 
-  // View
-  const handleOpenView = (item: any) => {
-    setViewItem(item);
-    setOpenView(true);
+  // VIEW IS INTENTIONALLY COMMENTED (AS REQUESTED)
+  /*
+  const handleOpenView = async (item: any) => {
+    try {
+      const res = await doctorService.getDoctorById(item.id);
+      setViewItem(res.data);
+      setOpenView(true);
+    } catch (e) {
+      alert("Failed to load doctor details");
+    }
   };
+  */
 
-  // Delete
   const handleDelete = async (item: any) => {
     const ok = window.confirm("Delete this doctor? This action cannot be undone.");
     if (!ok) return;
@@ -126,6 +141,34 @@ const DoctorsAdminPage: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-3">
+            {/* DATE FILTER */}
+            <div className="flex items-center gap-2">
+              <input
+                type="date"
+                value={fromDate}
+                onChange={(e) => setFromDate(e.target.value)}
+                className="px-3 py-2 border rounded-md text-sm"
+              />
+              <span className="text-gray-400 text-sm">to</span>
+              <input
+                type="date"
+                value={toDate}
+                onChange={(e) => setToDate(e.target.value)}
+                className="px-3 py-2 border rounded-md text-sm"
+              />
+              {(fromDate || toDate) && (
+                <button
+                  onClick={() => {
+                    setFromDate("");
+                    setToDate("");
+                  }}
+                  className="text-sm text-gray-500"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+
             {/* Search */}
             <div className="relative">
               <input
@@ -190,9 +233,9 @@ const DoctorsAdminPage: React.FC = () => {
 
                       <td className="px-6 py-4 text-right">
                         <div className="inline-flex items-center gap-2">
-                          <button onClick={() => handleOpenView(d)} className="px-3 py-1 rounded-md border text-sm bg-white hover:bg-gray-50">
+                          {/* <button onClick={() => handleOpenView(d)} className="px-3 py-1 rounded-md border text-sm bg-white hover:bg-gray-50">
                             View
-                          </button>
+                          </button> */}
                           <button onClick={() => handleOpenEdit(d)} className="px-3 py-1 rounded-md border text-sm text-green-700 hover:bg-green-50">
                             Edit
                           </button>

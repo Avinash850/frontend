@@ -1,10 +1,17 @@
 import API from "./api";
 
 export const hospitalService = {
-  getHospitals: async () => {
-    const res = await API.get("/api/hospitals");
-    return res.data;
-  },
+  // getHospitals: async () => {
+  //   const res = await API.get("/api/hospitals");
+  //   return res.data;
+  // },
+
+  getHospitals: async (params?: { from_date?: string; to_date?: string }) => {
+  const res = await API.get("/api/hospitals", { params });
+  return res.data;
+},
+
+
 
   getHospitalById: async (id: number) => {
     const res = await API.get(`/api/hospitals/${id}`);

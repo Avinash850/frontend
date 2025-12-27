@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaStar } from "react-icons/fa";
+import {FaCheckCircle,FaThumbsUp} from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import { HeroSearch } from "../components/HeroSearch";
 import defaultImage from "../assets/images/default_icon.png";
@@ -12,6 +12,10 @@ const DoctorProfile = () => {
   const { city, slug } = useParams();
   const [doctor, setDoctor] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [aboutExpanded, setAboutExpanded] = useState(false);
+  const [showAllServices, setShowAllServices] = useState(false);
+  const [showAllSpecializations, setShowAllSpecializations] = useState(false);
+
 
   useEffect(() => {
     if (!city || !slug) return;
@@ -19,16 +23,14 @@ const DoctorProfile = () => {
     const fetchDoctor = async () => {
       try {
         setLoading(true);
-
         const res = await getDoctorDetails({
           type: "doctor",
           slug,
           city,
           profile: true,
         });
-
         setDoctor(res?.items?.[0] || null);
-      } catch (err) {
+      } catch {
         setDoctor(null);
       } finally {
         setLoading(false);
@@ -36,7 +38,7 @@ const DoctorProfile = () => {
     };
 
     fetchDoctor();
-  }, [city, slug]); // 👈 THIS is enough
+  }, [city, slug]);
 
   if (loading) {
     return <div className="text-center py-16 text-gray-500">Loading…</div>;
@@ -50,48 +52,104 @@ const DoctorProfile = () => {
     );
   }
 
+  const ratingPercent = doctor.rating
+    ? Math.round((doctor.rating / 5) * 100)
+    : 0;
+
+  const aboutText = doctor.description || "";
+  const MAX_LENGTH = 180;
+  const isLong = aboutText.length > MAX_LENGTH;
+  const visibleText = aboutExpanded
+    ? aboutText
+    : aboutText.slice(0, MAX_LENGTH);
+
   return (
     <div className="max-w-7xl mx-auto my-8 px-4">
-      <div className="mb-6">
-        <HeroSearch />
-      </div>
+      <HeroSearch />
 
-      <div className="mb-4">
+      <div className="mt-4 mb-4">
         <BreadcrumbNav profileData={doctor} profileType="doctor" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Main Content */}
-        <div className="lg:col-span-8 bg-white p-5 sm:p-6 rounded-2xl shadow border">
-          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center sm:items-start">
+        {/* Main */}
+        <div className="lg:col-span-8 bg-white p-6 rounded-2xl shadow border">
+          <div className="flex flex-col sm:flex-row gap-6">
             <img
               src={doctor.image_url || defaultImage}
               alt={doctor.name}
-              className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border"
+              className="w-32 h-32 rounded-full object-cover border"
               onError={(e) => (e.currentTarget.src = defaultImage)}
             />
 
-            <div className="text-center sm:text-left">
-              <h1 className="text-xl sm:text-2xl font-semibold">
-                {doctor.name}
-              </h1>
+            <div className="flex-1">
+              {/* Name + claimed */}
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl font-semibold">
+                  {doctor.name}
+                </h1>
 
-              <p className="text-indigo-600">
-                {doctor.specialization_name}
-              </p>
-
-              <div className="flex justify-center sm:justify-start items-center gap-3 mt-2 text-sm">
-                <FaStar className="text-green-500" />
-                {doctor.rating || "0.0"}
-                {doctor.experience_years && (
-                  <span>{doctor.experience_years}+ yrs exp</span>
+                {doctor.is_profile_claimed === 1 && (
+                  <span className="text-xs text-green-600 font-medium">
+                    Profile is claimed
+                  </span>
                 )}
               </div>
 
-              {doctor.short_description && (
-                <p className="mt-3 text-gray-600">
-                  {doctor.short_description}
+              {doctor.degree && (
+                <p className="text-sm mt-1">{doctor.degree}</p>
+              )}
+
+              {doctor.designation && (
+                <p className="text-sm text-gray-600">
+                  {doctor.designation}
                 </p>
+              )}
+
+              {doctor.experience_years && (
+                <p className="text-sm mt-1">
+                  {doctor.experience_years} Years Experience Overall
+                </p>
+              )}
+
+              {doctor.registration_number && (
+                <div className="flex items-center gap-2 text-green-600 text-sm mt-2">
+                  <FaCheckCircle />
+                  Medical Registration Verified
+                </div>
+              )}
+
+              {/* Rating */}
+              <div className="flex items-center gap-2 mt-3 text-sm">
+                <FaThumbsUp className="text-green-600" />
+                <span className="font-semibold text-green-700">
+                  {ratingPercent}%
+                </span>
+                {doctor.patients_count > 0 && (
+                  <span className="text-gray-600">
+                    ({doctor.patients_count} patients)
+                  </span>
+                )}
+              </div>
+
+              {/* About */}
+              {aboutText && (
+                <div className="mt-4 text-sm text-gray-700">
+                  <p>
+                    {visibleText}
+                    {isLong && !aboutExpanded && "..."}
+                  </p>
+                  {isLong && (
+                    <button
+                      className="text-blue-600 mt-1"
+                      onClick={() =>
+                        setAboutExpanded(!aboutExpanded)
+                      }
+                    >
+                      {aboutExpanded ? "Read less" : "Read more"}
+                    </button>
+                  )}
+                </div>
               )}
             </div>
           </div>
@@ -99,11 +157,116 @@ const DoctorProfile = () => {
           <div className="mt-8">
             <DoctorProfileTabs doctor={doctor} />
           </div>
+
+          {/* Doctor Details Card */}
+          <div className="mt-6 bg-white rounded-2xl shadow border p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+              {/* Services */}
+              {Array.isArray(doctor.services) && doctor.services.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2">
+                    Services
+                  </h3>
+
+                  <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+                    {(showAllServices
+                      ? doctor.services
+                      : doctor.services.slice(0, 3)
+                    ).map(service => (
+                      <li key={service.id}>{service.name}</li>
+                    ))}
+                  </ul>
+
+                  {doctor.services.length > 3 && (
+                    <button
+                      className="text-blue-600 text-sm mt-1"
+                      onClick={() => setShowAllServices(!showAllServices)}
+                    >
+                      {showAllServices ? "View less" : "View all"}
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* Specializations */}
+              {Array.isArray(doctor.specializations) && doctor.specializations.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2">
+                    Specializations
+                  </h3>
+
+                  <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+                    {(showAllSpecializations
+                      ? doctor.specializations
+                      : doctor.specializations.slice(0, 3)
+                    ).map(spec => (
+                      <li key={spec.id}>{spec.name}</li>
+                    ))}
+                  </ul>
+
+                  {doctor.specializations.length > 3 && (
+                    <button
+                      className="text-blue-600 text-sm mt-1"
+                      onClick={() =>
+                        setShowAllSpecializations(!showAllSpecializations)
+                      }
+                    >
+                      {showAllSpecializations ? "View less" : "View all"}
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* Education */}
+              {(doctor.degree ||
+                doctor.doctor_college ||
+                doctor.pass_year) && (
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2">
+                    Education
+                  </h3>
+
+                  <ul className="list-disc list-inside text-sm text-gray-700">
+                    <li>
+                      {doctor.degree}
+                      {doctor.doctor_college &&
+                        ` - ${doctor.doctor_college}`}
+                      {doctor.pass_year &&
+                        `, ${doctor.pass_year}`}
+                    </li>
+                  </ul>
+                </div>
+              )}
+
+              {/* Registrations */}
+              {(doctor.registration_number ||
+                doctor.doctor_council) && (
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2">
+                    Registrations
+                  </h3>
+
+                  <ul className="list-disc list-inside text-sm text-gray-700">
+                    <li>
+                      {doctor.registration_number}
+                      {doctor.doctor_council &&
+                        ` - ${doctor.doctor_council}`}
+                      {doctor.doctor_council_year &&
+                        `, ${doctor.doctor_council_year}`}
+                    </li>
+                  </ul>
+                </div>
+              )}
+
+            </div>
+          </div>
+
         </div>
 
         {/* Sidebar */}
         <div className="lg:col-span-4">
-          <div className="lg:sticky lg:top-24">
+          <div className="sticky top-24">
             <GetInTouchForm />
           </div>
         </div>

@@ -137,10 +137,21 @@ export const doctorService = {
   // ================================
   // GET ALL DOCTORS
   // ================================
-  getDoctors: async () => {
-    const res = await API.get(`/api/doctors`);
-    return res.data;
-  },
+  // getDoctors: async () => {
+  //   const res = await API.get(`/api/doctors`);
+  //   return res.data;
+  // },.
+
+  getDoctors: async (params?: {
+  from_date?: string;
+  to_date?: string;
+}) => {
+  const res = await API.get(`/api/doctors`, {
+    params,
+  });
+  return res;
+},
+
 
   // ================================
   // CREATE DOCTOR

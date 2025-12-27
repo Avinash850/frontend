@@ -1,12 +1,19 @@
 import React, { useState } from "react";
-import { FaStar } from "react-icons/fa";
+import { FaStar, FaPhone, FaMapMarkerAlt } from "react-icons/fa";
 import defaultImage from "../assets/images/default_icon.png";
 import { useNavigate } from "react-router-dom";
+import { FaCheckCircle, FaCreditCard } from "react-icons/fa";
+
 
 const DoctorProfileTabs = ({ doctor }) => {
   const [activeTab, setActiveTab] = useState("info");
-  const navigate = useNavigate();
+  const [showAll, setShowAll] = useState(false);
 
+  // image modal state
+  const [galleryImages, setGalleryImages] = useState(null);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+  const navigate = useNavigate();
   if (!doctor) return null;
 
   const clinics = doctor.clinics || [];
@@ -21,35 +28,10 @@ const DoctorProfileTabs = ({ doctor }) => {
     .toLowerCase()
     .replace(/\s+/g, "-");
 
-  const specialization = doctor.specialization_name || "medical care";
-  const doctorName = doctor.name;
-  const city = doctor.city_name || "your city";
-
-  const stories = [
-    `Dr. ${doctorName} explained my condition clearly and made me feel comfortable throughout the consultation.`,
-    `I visited Dr. ${doctorName} for ${specialization.toLowerCase()} treatment. The diagnosis was accurate and effective.`,
-    `Very professional and patient-friendly doctor. Highly recommended for ${specialization.toLowerCase()} in ${city}.`,
-  ];
-
-  const questions = [
-    {
-      q: `What is the common treatment for ${specialization.toLowerCase()} issues?`,
-      a: `Dr. ${doctorName} usually recommends treatment based on patient history, lifestyle, and severity of symptoms.`,
-    },
-    {
-      q: `When should I consult a ${specialization.toLowerCase()} specialist?`,
-      a: `If symptoms persist or affect daily life, it is advisable to consult a specialist like Dr. ${doctorName}.`,
-    },
-  ];
-
-  const healthfeed = [
-    `Tips to maintain good ${specialization.toLowerCase()} health`,
-    `When to seek medical help for ${specialization.toLowerCase()} problems`,
-    `Lifestyle changes recommended by ${specialization.toLowerCase()} specialists`,
-  ];
+  const visiblePractices = showAll ? practices : practices.slice(0, 1);
 
   /* =========================
-     PRACTICE CARD (RESPONSIVE)
+     PRACTICE CARD
      ========================= */
   const PracticeCard = ({ item }) => {
     const goToProfile = () => {
@@ -57,18 +39,22 @@ const DoctorProfileTabs = ({ doctor }) => {
       navigate(`/${citySlug}/${item.type}/${item.slug}`);
     };
 
-    return (
-      <div className="border rounded-xl p-4 mb-4">
-        <div className="flex flex-col sm:flex-row gap-4">
-          {/* Image */}
-          <img
-            src={item.image_url || defaultImage}
-            onClick={goToProfile}
-            className="w-20 h-20 rounded-lg border object-cover cursor-pointer mx-auto sm:mx-0"
-          />
+    const images =
+      item.images && item.images.length
+        ? item.images
+        : item.image_url
+        ? [{ image_url: item.image_url }]
+        : [];
 
-          {/* Info */}
-          <div className="flex-1 text-center sm:text-left">
+    return (
+      <div className="border-b py-6">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+          {/* LEFT */}
+          <div className="md:col-span-5">
+            <p className="text-sm text-gray-600 mb-1">
+              {doctor.area_name}, {doctor.city_name}
+            </p>
+
             <h4
               onClick={goToProfile}
               className="text-blue-600 font-semibold cursor-pointer hover:underline"
@@ -76,31 +62,167 @@ const DoctorProfileTabs = ({ doctor }) => {
               {item.name}
             </h4>
 
-            {item.rating && (
-              <div className="flex justify-center sm:justify-start items-center text-green-600 text-sm mt-1">
-                {item.rating} <FaStar className="ml-1" />
+            {item.rating > 0 && (
+              <div className="flex items-center gap-1 text-green-600 text-sm mt-1">
+                <span>{item.rating}</span>
+                {[...Array(5)].map((_, i) => (
+                  <FaStar key={i} />
+                ))}
               </div>
             )}
 
-            <p className="text-sm mt-2 text-gray-700">
-              <b>Timing:</b> {item.timing || "Available on appointment"}
+            <p className="text-sm text-gray-700 mt-2">
+              {item.display_address || item.address}
             </p>
 
-            <p className="text-sm text-gray-700">
-              <b>Fee:</b> ₹{item.consultation_fee || "N/A"}
-            </p>
+            <a
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                item.display_address || item.address || ""
+              )}`}
+              target="_blank"
+              rel="noreferrer"
+              className="text-sm text-blue-600 mt-1 inline-block"
+            >
+              Get Directions
+            </a>
 
-            <p className="text-sm text-gray-600 mt-1">
-              {item.address || item.practice_address}
-            </p>
+            {/* Images */}
+            {images.length > 0 && (
+              <div className="flex items-center gap-2 mt-3">
+                {images.slice(0, 3).map((img, i) => (
+                  <img
+                    key={i}
+                    src={img.image_url || defaultImage}
+                    onClick={() => {
+                      setGalleryImages(images);
+                      setActiveImageIndex(i);
+                    }}
+                    className="w-12 h-12 rounded object-cover border cursor-pointer"
+                  />
+                ))}
+
+                {images.length > 3 && (
+                  <div
+                    onClick={() => {
+                      setGalleryImages(images);
+                      setActiveImageIndex(3);
+                    }}
+                    className="w-12 h-12 flex items-center justify-center bg-gray-100 text-xs rounded border cursor-pointer"
+                  >
+                    +{images.length - 3}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
-          {/* CTA */}
-          <div className="flex sm:items-end">
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm w-full sm:w-auto">
-              Book Appointment
-            </button>
+          {/* MIDDLE */}
+          {/* <div className="md:col-span-3 text-sm text-gray-700">
+            <p className="font-medium">
+              {item.is_on_call === 1
+                ? "ON-CALL"
+                : item.display_timing || "Available on appointment"}
+            </p>
+          </div> */}
+          {/* MIDDLE */}
+          <div className="md:col-span-4 text-sm text-gray-700">
+            {item.is_on_call === 1 ? (
+              <p className="font-medium">ON-CALL</p>
+            ) : item.display_timing_days && item.display_timing_time ? (
+              <>
+                <p className="font-medium">{item.display_timing_days}</p>
+                <p className="text-gray-600">{item.display_timing_time}</p>
+              </>
+            ) 
+            : (
+              <p className="font-medium">Available on appointment</p>
+            )
+            }
           </div>
+
+
+
+          {/* RIGHT */}
+          {/* <div className="md:col-span-3 text-right">
+            {item.is_profile_claimed === 1 && (
+              <div className="inline-flex items-center gap-1 mb-2 text-purple-600 text-sm font-medium">
+                <span>Prime</span>
+                <FaCheckCircle className="text-purple-600 text-xs" />
+                <span className="text-gray-500 font-normal">
+                  Verified details
+                </span>
+              </div>
+            )}
+
+            {item.consultation_fee && (
+              <p className="text-lg font-semibold mb-3">
+                ₹{item.consultation_fee}
+              </p>
+            )}
+
+            {item.phone_1 && (
+              <a
+                href={`tel:${item.phone_1}`}
+                className="inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-6 py-2 rounded-md text-sm"
+              >
+                <FaPhone /> Call Now
+              </a>
+            )}
+          </div> */}
+
+          {/* RIGHT */}
+          <div className="md:col-span-3 flex flex-col items-end justify-between">
+            
+            {/* TOP INFO (Prime + Online Payment) */}
+            <div className="text-right space-y-1">
+
+              {item.payment_type === 1 && (
+                <div className="flex items-center justify-end gap-1 text-gray-600 text-sm">
+                  <FaCreditCard className="text-xs" />
+                  <span>Online Payment Available</span>
+                </div>
+              )}
+            </div>
+
+            {item.is_profile_claimed === 1 && (
+                // <div className="inline-flex items-center gap-1 text-purple-600 text-sm font-medium">
+                //   <span>Prime</span>
+                //   <FaCheckCircle className="text-xs" />
+                //   <span className="text-xs font-normal">
+                //     Verified details
+                //   </span>
+                // </div>
+
+                <div className="text-right">
+                  <div className="inline-flex items-center gap-1 text-purple-600 text-sm font-medium">
+                    <span>Prime</span>
+                    <FaCheckCircle className="text-xs" />
+                  </div>
+
+                  <div className="text-xs text-purple-500 leading-tight">
+                    Verified details
+                  </div>
+                </div>
+              )}
+
+            {/* FEE */}
+            {item.consultation_fee && (
+              <p className="text-lg font-semibold mt-4">
+                ₹{item.consultation_fee}
+              </p>
+            )}
+
+            {/* ACTION BUTTON (BOTTOM RIGHT) */}
+            {item.phone_1 && (
+              <a
+                href={`tel:${item.phone_1}`}
+                className="mt-4 inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-6 py-2 rounded-md text-sm"
+              >
+                <FaPhone /> Call Now
+              </a>
+            )}
+          </div>
+
         </div>
       </div>
     );
@@ -108,7 +230,7 @@ const DoctorProfileTabs = ({ doctor }) => {
 
   return (
     <div className="bg-white rounded-2xl shadow border">
-      {/* Tabs (Scrollable on mobile) */}
+      {/* Tabs */}
       <div className="flex border-b overflow-x-auto whitespace-nowrap">
         {["info", "stories", "consult", "healthfeed"].map((tab) => (
           <button
@@ -121,7 +243,7 @@ const DoctorProfileTabs = ({ doctor }) => {
             }`}
           >
             {tab === "info" && "Info"}
-            {tab === "stories" && `Stories (${stories.length})`}
+            {tab === "stories" && "Stories"}
             {tab === "consult" && "Consult Q&A"}
             {tab === "healthfeed" && "Healthfeed"}
           </button>
@@ -130,46 +252,68 @@ const DoctorProfileTabs = ({ doctor }) => {
 
       {/* Content */}
       <div className="p-4 sm:p-5">
-        {activeTab === "info" &&
-          practices.map((p, i) => <PracticeCard key={i} item={p} />)}
-
-        {activeTab === "stories" && (
-          <div className="space-y-4">
-            {stories.map((s, i) => (
-              <div key={i} className="bg-gray-50 p-4 rounded-lg">
-                <p className="font-medium text-gray-800">"{s}"</p>
-                <p className="text-sm text-gray-500 mt-1">
-                  — Verified Patient
-                </p>
-              </div>
+        {activeTab === "info" && (
+          <>
+            {visiblePractices.map((p, i) => (
+              <PracticeCard key={i} item={p} />
             ))}
-          </div>
-        )}
 
-        {activeTab === "consult" && (
-          <div className="space-y-4">
-            {questions.map((q, i) => (
-              <div key={i} className="bg-gray-50 p-4 rounded-lg">
-                <p className="font-semibold">Q: {q.q}</p>
-                <p className="text-sm text-gray-700 mt-1">A: {q.a}</p>
+            {practices.length > 1 && !showAll && (
+              <div className="text-center mt-4">
+                <button
+                  onClick={() => setShowAll(true)}
+                  className="border border-blue-600 text-blue-600 px-6 py-1 rounded-md text-sm"
+                >
+                  More
+                </button>
               </div>
-            ))}
-          </div>
-        )}
-
-        {activeTab === "healthfeed" && (
-          <div className="space-y-3">
-            {healthfeed.map((h, i) => (
-              <div key={i} className="bg-gray-50 p-3 rounded-lg">
-                <p className="font-semibold text-gray-800">{h}</p>
-                <p className="text-sm text-gray-600 mt-1">
-                  Curated by medical experts
-                </p>
-              </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
       </div>
+
+      {/* IMAGE MODAL */}
+      {galleryImages && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+          <div className="relative bg-white rounded-lg p-4 max-w-lg w-full">
+            <button
+              onClick={() => setGalleryImages(null)}
+              className="absolute top-2 right-3 text-xl text-gray-600"
+            >
+              ✕
+            </button>
+
+            <img
+              src={galleryImages[activeImageIndex].image_url}
+              className="w-full h-80 object-cover rounded"
+            />
+
+            <div className="flex justify-between mt-3">
+              <button
+                disabled={activeImageIndex === 0}
+                onClick={() =>
+                  setActiveImageIndex((i) => i - 1)
+                }
+                className="text-blue-600 disabled:opacity-40"
+              >
+                Prev
+              </button>
+
+              <button
+                disabled={
+                  activeImageIndex === galleryImages.length - 1
+                }
+                onClick={() =>
+                  setActiveImageIndex((i) => i + 1)
+                }
+                className="text-blue-600 disabled:opacity-40"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

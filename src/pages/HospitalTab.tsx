@@ -1,81 +1,253 @@
+// import React, { useState } from "react";
+// import { FaStar } from "react-icons/fa";
+// import defaultImage from "../assets/images/default_icon.png";
+// import { useNavigate } from "react-router-dom";
+
+// const HospitalProfileTabs = ({ hospital }) => {
+//   const [activeTab, setActiveTab] = useState("overview");
+
+//   // 🔁 SAME IMAGE MODAL LOGIC AS DOCTOR
+//   const [galleryImages, setGalleryImages] = useState(null);
+//   const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+//   const navigate = useNavigate();
+//   if (!hospital) return null;
+
+//   const doctors = hospital.doctors || [];
+//   const services = hospital.services || [];
+//   const stories = hospital.stories || [];
+//   const questions = hospital.questions || [];
+
+//   // future-ready
+//   const images = hospital.images || [];
+
+//   const tabs = [
+//     { key: "overview", title: "Overview" },
+//     { key: "doctors", title: `Doctors (${doctors.length})` },
+//     { key: "stories", title: `Stories (${hospital.patients_stories || 0})` },
+//     { key: "services", title: "Services" },
+//     { key: "other", title: "Other Centers" },
+//     { key: "questions", title: "Questions" },
+//   ];
+
+//   return (
+//     <div className="bg-white rounded-2xl border border-gray-200">
+//       {/* ===================== TABS ===================== */}
+//       <div className="flex border-b border-gray-200 px-6 overflow-x-auto">
+//         {tabs.map((tab) => (
+//           <button
+//             key={tab.key}
+//             onClick={() => setActiveTab(tab.key)}
+//             className={`px-4 py-3 text-sm font-semibold border-b-2 ${
+//               activeTab === tab.key
+//                 ? "text-blue-600 border-blue-600"
+//                 : "text-gray-600 border-transparent hover:text-blue-500"
+//             }`}
+//           >
+//             {tab.title}
+//           </button>
+//         ))}
+//       </div>
+
+//       {/* ===================== CONTENT ===================== */}
+//       <div className="p-6 text-sm text-gray-700">
+//         {/* ===================== OVERVIEW ===================== */}
+//         {activeTab === "overview" && (
+//           <>
+//             {/* ABOUT */}
+//             <div>
+//               <h3 className="font-semibold text-gray-900 mb-2">
+//                 About {hospital.name}
+//               </h3>
+//               <p className="leading-relaxed">
+//                 {hospital.about || hospital.short_description || ""}
+//               </p>
+//             </div>
+
+//             {/* BOTTOM ROW */}
+//             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+//               {/* TIMINGS */}
+//               <div>
+//                 <h4 className="font-semibold mb-2">Timings</h4>
+//                 <p>{hospital.timing || ""}</p>
+//               </div>
+
+//               {/* SERVICES */}
+//               <div>
+//                 <h4 className="font-semibold mb-2">Services</h4>
+//                 <ul className="grid grid-cols-2 gap-y-1">
+//                   {services.map((s) => (
+//                     <li key={s.id}>{s.name}</li>
+//                   ))}
+//                 </ul>
+//               </div>
+
+//               {/* PHOTOS (WITH POPUP) */}
+//               <div>
+//                 <h4 className="font-semibold mb-2">Photos</h4>
+
+//                 <div className="flex items-center gap-2">
+//                   {images.slice(0, 4).map((img, i) => (
+//                     <img
+//                       key={i}
+//                       src={img.image_url || defaultImage}
+//                       onClick={() => {
+//                         setGalleryImages(images);
+//                         setActiveImageIndex(i);
+//                       }}
+//                       className="w-12 h-12 rounded object-cover border cursor-pointer"
+//                     />
+//                   ))}
+
+//                   {images.length > 4 && (
+//                     <div
+//                       onClick={() => {
+//                         setGalleryImages(images);
+//                         setActiveImageIndex(4);
+//                       }}
+//                       className="w-12 h-12 flex items-center justify-center bg-gray-100 text-xs rounded border cursor-pointer"
+//                     >
+//                       +{images.length - 4}
+//                     </div>
+//                   )}
+
+//                   {images.length === 0 && (
+//                     <span className="text-gray-400 text-sm">
+//                       No photos available
+//                     </span>
+//                   )}
+//                 </div>
+//               </div>
+//             </div>
+//           </>
+//         )}
+
+//         {/* DOCTORS */}
+//         {activeTab === "doctors" &&
+//           doctors.map((d) => (
+//             <div key={d.id}>{d.name}</div>
+//           ))}
+
+//         {/* STORIES */}
+//         {activeTab === "stories" && (
+//           <p className="text-gray-500">
+//             Patient stories will be available soon.
+//           </p>
+//         )}
+
+//         {/* SERVICES */}
+//         {activeTab === "services" && (
+//           <ul className="grid md:grid-cols-2 gap-3">
+//             {services.map((s) => (
+//               <li
+//                 key={s.id}
+//                 className="border border-gray-200 rounded-lg p-3 bg-gray-50"
+//               >
+//                 {s.name}
+//               </li>
+//             ))}
+//           </ul>
+//         )}
+
+//         {/* QUESTIONS */}
+//         {activeTab === "questions" && (
+//           <p className="text-gray-500">
+//             Questions will be available soon.
+//           </p>
+//         )}
+//       </div>
+
+//       {/* ===================== IMAGE MODAL (SAME AS DOCTOR) ===================== */}
+//       {galleryImages && (
+//         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+//           <div className="relative bg-white rounded-lg p-4 max-w-lg w-full">
+//             <button
+//               onClick={() => setGalleryImages(null)}
+//               className="absolute top-2 right-3 text-xl text-gray-600"
+//             >
+//               ✕
+//             </button>
+
+//             <img
+//               src={galleryImages[activeImageIndex].image_url}
+//               className="w-full h-80 object-cover rounded"
+//             />
+
+//             <div className="flex justify-between mt-3">
+//               <button
+//                 disabled={activeImageIndex === 0}
+//                 onClick={() =>
+//                   setActiveImageIndex((i) => i - 1)
+//                 }
+//                 className="text-blue-600 disabled:opacity-40"
+//               >
+//                 Prev
+//               </button>
+
+//               <button
+//                 disabled={
+//                   activeImageIndex === galleryImages.length - 1
+//                 }
+//                 onClick={() =>
+//                   setActiveImageIndex((i) => i + 1)
+//                 }
+//                 className="text-blue-600 disabled:opacity-40"
+//               >
+//                 Next
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default HospitalProfileTabs;
+
+
+
+
+
+
+
+
+
 import React, { useState } from "react";
 import { FaStar, FaPhone } from "react-icons/fa";
 import defaultImage from "../assets/images/default_icon.png";
 import { useNavigate } from "react-router-dom";
 
-
 const HospitalProfileTabs = ({ hospital }) => {
   const [activeTab, setActiveTab] = useState("overview");
+  const [showAllServices, setShowAllServices] = useState(false);
+  const [showAllOverviewServices, setShowAllOverviewServices] = useState(false);
+
+
+  // IMAGE MODAL (used only for hospital photos)
+  const [galleryImages, setGalleryImages] = useState(null);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   const navigate = useNavigate();
+  if (!hospital) return null;
+
+  const doctors = hospital.doctors || [];
+  const services = hospital.services || [];
+  const images = hospital.images || [];
 
   const citySlug = (hospital.city_name || "")
     .toLowerCase()
     .replace(/\s+/g, "-");
 
-
-  if (!hospital) return null;
-
-  const doctors = hospital.doctors || [];
-
   const tabs = [
     { key: "overview", title: "Overview" },
     { key: "doctors", title: `Doctors (${doctors.length})` },
-    { key: "stories", title: "Stories" },
+    { key: "stories", title: `Stories (${hospital.patients_stories || 0})` },
     { key: "services", title: "Services" },
     { key: "questions", title: "Questions" },
   ];
 
-  /* ===================== STATIC (SAFE, PRACTO-LIKE) ===================== */
-
-  const stories = [
-    {
-      id: 1,
-      title: "Very professional and clean hospital",
-      content:
-        "The hospital staff was very cooperative and the facilities were well maintained. Doctors explained everything clearly.",
-      author: "Verified Patient",
-      date: "2 months ago",
-      rating: 5,
-    },
-    {
-      id: 2,
-      title: "Good experience overall",
-      content:
-        "Consultation and admission process was smooth. Waiting time was reasonable and staff was supportive.",
-      author: "Verified Patient",
-      date: "5 months ago",
-      rating: 4.5,
-    },
-  ];
-
-  const questions = [
-    {
-      id: 1,
-      q: "Does this hospital provide emergency services?",
-      a: "Yes, emergency services are available. Availability may vary by department.",
-    },
-    {
-      id: 2,
-      q: "Are cashless insurance facilities available?",
-      a: "Most major insurance providers are accepted. Please confirm with the hospital directly.",
-    },
-    {
-      id: 3,
-      q: "What are the visiting hours?",
-      a: "Visiting hours depend on department and patient condition.",
-    },
-  ];
-
-  const services = hospital.services || [
-    "Emergency Care",
-    "Diagnostic Services",
-    "Outpatient Consultation",
-    "Inpatient Care",
-    "Surgical Procedures",
-  ];
-
-  /* ===================== DOCTOR CARD ===================== */
+  /* ===================== OLD & CORRECT DOCTOR CARD ===================== */
 
   const renderDoctorCard = (doctor) => {
     const goToDoctorProfile = () => {
@@ -88,7 +260,6 @@ const HospitalProfileTabs = ({ hospital }) => {
         key={doctor.id}
         className="flex gap-4 border border-gray-200 rounded-xl p-4 mb-4"
       >
-        {/* IMAGE (clickable) */}
         <div className="w-20 h-20 flex-shrink-0">
           <img
             src={doctor.image_url || defaultImage}
@@ -100,7 +271,6 @@ const HospitalProfileTabs = ({ hospital }) => {
         </div>
 
         <div className="flex-1">
-          {/* NAME (clickable) */}
           <h4
             className="text-blue-600 font-semibold text-lg cursor-pointer hover:underline"
             onClick={goToDoctorProfile}
@@ -138,13 +308,13 @@ const HospitalProfileTabs = ({ hospital }) => {
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200">
-      {/* ===================== TABS ===================== */}
-      <div className="flex border-b border-gray-200 px-4 overflow-x-auto">
+      {/* TABS */}
+      <div className="flex border-b border-gray-200 px-6 overflow-x-auto">
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-4 py-3 text-sm font-semibold border-b-2 whitespace-nowrap ${
+            className={`px-4 py-3 text-sm font-semibold border-b-2 ${
               activeTab === tab.key
                 ? "text-blue-600 border-blue-600"
                 : "text-gray-600 border-transparent hover:text-blue-500"
@@ -155,115 +325,342 @@ const HospitalProfileTabs = ({ hospital }) => {
         ))}
       </div>
 
-      {/* ===================== CONTENT ===================== */}
-      <div className="p-5">
+      {/* CONTENT */}
+      <div className="p-6 text-sm text-gray-700">
         {/* OVERVIEW */}
         {activeTab === "overview" && (
-          <div className="grid md:grid-cols-2 gap-6 text-sm text-gray-700">
+          <>
             <div>
               <h3 className="font-semibold text-gray-900 mb-2">
                 About {hospital.name}
               </h3>
               <p className="leading-relaxed">
-                {hospital.description ||
-                  hospital.short_description ||
-                  `${hospital.name} is a trusted healthcare provider offering quality medical services.`}
+                {hospital.about || hospital.short_description || ""}
               </p>
-
-              {hospital.address && (
-                <>
-                  <h4 className="font-semibold mt-4">Address</h4>
-                  <p>{hospital.address}</p>
-                </>
-              )}
             </div>
 
-            <div>
-              {hospital.timings && (
-                <>
-                  <h4 className="font-semibold">Timings</h4>
-                  <p className="text-green-600">{hospital.timings}</p>
-                </>
-              )}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+              {/* <div>
+                <h4 className="font-semibold mb-2">Timings</h4>
+                <p>{hospital.timing || ""}</p>
+              </div> */}
 
-              {hospital.beds && (
-                <p className="mt-2">
-                  <strong>Number of Beds:</strong> {hospital.beds}
-                </p>
-              )}
+              {/* <div>
+                <h4 className="font-semibold mb-2">Services</h4>
+                <ul className="grid grid-cols-2 gap-y-1">
+                  {services.map((s) => (
+                    <li key={s.id}>{s.name}</li>
+                  ))}
+                </ul>
+              </div> */}
 
-              {hospital.ambulances && (
-                <p>
-                  <strong>Ambulances:</strong> {hospital.ambulances}
-                </p>
-              )}
+
+              {/* <div>
+                <h4 className="font-semibold mb-2">Services</h4>
+
+                <ul className="grid grid-cols-2 gap-y-1 text-sm text-gray-700">
+                  {(showAllOverviewServices
+                    ? services
+                    : services.slice(0, 12)
+                  ).map((s) => (
+                    <li key={s.id} className="flex items-start gap-1">
+                      <span>•</span>
+                      <span>{s.name}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {services.length > 12 && (
+                  <button
+                    onClick={() =>
+                      setShowAllOverviewServices((prev) => !prev)
+                    }
+                    className="mt-2 text-blue-600 text-sm font-medium hover:underline"
+                  >
+                    {showAllOverviewServices
+                      ? "View less"
+                      : `View all (${services.length})`}
+                  </button>
+                )}
+              </div> */}
+
+              <div>
+                  <h4 className="font-semibold mb-2">Services</h4>
+
+                  <ul className="grid grid-cols-2 gap-y-1 text-sm text-gray-700">
+                    {(showAllOverviewServices ? services : services.slice(0, 6)).map(
+                      (s) => (
+                        <li
+                          key={s.id}
+                          className="leading-snug line-clamp-2"
+                          title={s.name}
+                        >
+                          {s.name}
+                        </li>
+                      )
+                    )}
+                  </ul>
+
+                  {services.length > 6 && (
+                    <button
+                      onClick={() => setShowAllOverviewServices((prev) => !prev)}
+                      className="mt-2 text-blue-600 text-sm font-medium hover:underline"
+                    >
+                      {showAllOverviewServices
+                        ? "View less"
+                        : `View all (${services.length})`}
+                    </button>
+                  )}
+              </div>
+
+               <div>
+                <h4 className="font-semibold mb-2">Timings</h4>
+                <p>{hospital.timing || ""}</p>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-2">Photos</h4>
+                <div className="flex items-center gap-2">
+                  {images.slice(0, 4).map((img, i) => (
+                    <img
+                      key={i}
+                      src={img.image_url || defaultImage}
+                      onClick={() => {
+                        setGalleryImages(images);
+                        setActiveImageIndex(i);
+                      }}
+                      className="w-12 h-12 rounded object-cover border cursor-pointer"
+                    />
+                  ))}
+
+                  {images.length > 4 && (
+                    <div
+                      onClick={() => {
+                        setGalleryImages(images);
+                        setActiveImageIndex(4);
+                      }}
+                      className="w-12 h-12 flex items-center justify-center bg-gray-100 text-xs rounded border cursor-pointer"
+                    >
+                      +{images.length - 4}
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
-        )}
-
-        {/* DOCTORS */}
-        {activeTab === "doctors" && (
-          <>
-            {doctors.length > 0 ? (
-              doctors.map(renderDoctorCard)
-            ) : (
-              <p className="text-gray-500 text-sm">
-                No doctors listed for this hospital.
-              </p>
-            )}
           </>
         )}
 
+        {/* DOCTORS — RESTORED OLD CODE */}
+        {/* {activeTab === "doctors" &&
+          (doctors.length > 0
+            ? doctors.map(renderDoctorCard)
+            : <p className="text-gray-500">No doctors listed.</p>)} */}
+
+            {activeTab === "doctors" && (
+              <div>
+                {/* HEADER */}
+                <h2 className="text-lg font-semibold mb-4">
+                  Doctors in {hospital.name}
+                </h2>
+
+                {/* FILTER BAR (UI only, logic later) */}
+                <div className="border border-gray-200 rounded-lg p-4 mb-6">
+                  <p className="text-sm text-gray-600 mb-2">
+                    Filter specialties…
+                  </p>
+
+                  <div className="flex flex-wrap gap-2">
+                    <button className="px-4 py-1 text-sm rounded-full bg-blue-600 text-white">
+                      All ({doctors.length})
+                    </button>
+                    
+                    {Array.from(
+                      new Set(doctors.map(d => d.designation).filter(Boolean))
+                    ).map((spec, i) => (
+                      <button
+                        key={i}
+                        className="px-4 py-1 text-sm rounded-full bg-gray-100 text-gray-700"
+                      >
+                        {spec}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* DOCTOR LIST */}
+                  <div className="space-y-6">
+                    {doctors.map((doctor) => (
+                      <div
+                        key={doctor.id}
+                        className="border border-gray-200 rounded-xl p-6"
+                      >
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                          {/* LEFT */}
+                          <div className="md:col-span-7 flex gap-4">
+                            <img
+                              src={doctor.image_url || defaultImage}
+                              alt={doctor.name}
+                              className="w-24 h-24 object-cover rounded border"
+                            />
+
+                            <div>
+                              <h3
+                                className="text-blue-600 font-semibold text-lg cursor-pointer hover:underline"
+                                onClick={() =>
+                                  navigate(`/${hospital.city_name?.toLowerCase()}/doctor/${doctor.slug}`)
+                                }
+                              >
+                                {doctor.name}
+                              </h3>
+
+                              {doctor.degree && (
+                                <p className="text-sm">{doctor.degree}</p>
+                              )}
+
+                              {doctor.experience_years && (
+                                <p className="text-sm text-gray-600">
+                                  {doctor.experience_years} years experience overall
+                                </p>
+                              )}
+
+                              {doctor.designation && (
+                                <p className="text-sm text-gray-600">
+                                  {doctor.designation}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* RIGHT */}
+                          <div className="md:col-span-5 text-sm space-y-2">
+                            {doctor.patients_count > 0 && (
+                              <p>
+                                💬 {doctor.patients_count} Patient Stories
+                              </p>
+                            )}
+
+                            {doctor.consultation_fee && (
+                              <p className="font-semibold">
+                                ₹{doctor.consultation_fee}
+                              </p>
+                            )}
+
+                            {doctor.timings && (
+                              <p>
+                                🕒 {doctor.timings}
+                              </p>
+                            )}
+
+                            {/* ACTION BUTTONS */}
+                            <div className="flex gap-3 mt-4">
+                              <button className="border border-blue-600 text-blue-600 px-4 py-2 rounded-md text-sm">
+                                Contact Clinic
+                              </button>
+
+                              <button className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm">
+                                Book Clinic Visit
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+            )}
+
+
         {/* STORIES */}
         {activeTab === "stories" && (
-          <div className="space-y-4">
-            {stories.map((s) => (
-              <div
-                key={s.id}
-                className="border border-gray-200 rounded-xl p-4 bg-gray-50"
-              >
-                <div className="flex items-center text-green-600 text-sm font-semibold">
-                  ⭐ {s.rating}
-                </div>
-                <h4 className="font-semibold mt-1">{s.title}</h4>
-                <p className="text-sm text-gray-700 mt-2">{s.content}</p>
-                <p className="text-xs text-gray-500 mt-2">
-                  — {s.author}, {s.date}
-                </p>
-              </div>
-            ))}
-          </div>
+          <p className="text-gray-500">
+            Patient stories will be available soon.
+          </p>
         )}
 
         {/* SERVICES */}
-        {activeTab === "services" && (
-          <ul className="grid md:grid-cols-2 gap-3 text-sm text-gray-700">
-            {services.map((s, i) => (
+        {/* {activeTab === "services" && (
+          <ul className="grid md:grid-cols-2 gap-3">
+            {services.map((s) => (
               <li
-                key={i}
+                key={s.id}
                 className="border border-gray-200 rounded-lg p-3 bg-gray-50"
               >
-                {s}
+                {s.name}
               </li>
             ))}
           </ul>
+        )} */}
+
+       {activeTab === "services" && (
+          <div>
+            {/* SERVICES LIST */}
+            <ul className="columns-1 md:columns-3 gap-x-8 list-disc list-inside space-y-2">
+              {(showAllServices ? services : services.slice(0, 12)).map((s) => (
+                <li key={s.id} className="text-sm text-gray-700 break-inside-avoid">
+                  {s.name}
+                </li>
+              ))}
+            </ul>
+
+            {/* VIEW ALL */}
+            {services.length > 12 && (
+              <button
+                onClick={() => setShowAllServices((prev) => !prev)}
+                className="mt-4 text-blue-600 text-sm font-medium hover:underline"
+              >
+                {showAllServices
+                  ? "View less"
+                  : `View all (${services.length})`}
+              </button>
+            )}
+          </div>
         )}
+
+
 
         {/* QUESTIONS */}
         {activeTab === "questions" && (
-          <div className="space-y-4">
-            {questions.map((q) => (
-              <div
-                key={q.id}
-                className="border border-gray-200 rounded-xl p-4"
-              >
-                <p className="font-medium">Q. {q.q}</p>
-                <p className="text-sm text-gray-700 mt-1">A. {q.a}</p>
-              </div>
-            ))}
-          </div>
+          <p className="text-gray-500">
+            Questions will be available soon.
+          </p>
         )}
       </div>
+
+      {/* IMAGE MODAL */}
+      {galleryImages && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+          <div className="relative bg-white rounded-lg p-4 max-w-lg w-full">
+            <button
+              onClick={() => setGalleryImages(null)}
+              className="absolute top-2 right-3 text-xl text-gray-600"
+            >
+              ✕
+            </button>
+
+            <img
+              src={galleryImages[activeImageIndex].image_url}
+              className="w-full h-80 object-cover rounded"
+            />
+
+            <div className="flex justify-between mt-3">
+              <button
+                disabled={activeImageIndex === 0}
+                onClick={() => setActiveImageIndex((i) => i - 1)}
+                className="text-blue-600 disabled:opacity-40"
+              >
+                Prev
+              </button>
+
+              <button
+                disabled={activeImageIndex === galleryImages.length - 1}
+                onClick={() => setActiveImageIndex((i) => i + 1)}
+                className="text-blue-600 disabled:opacity-40"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
