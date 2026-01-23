@@ -102,6 +102,24 @@ export const getDoctorDetails = async (payload) => {
   };
 
 
+  // discovery: top hospitals & top procedures by city
+export const getSearchDiscover = async ({ city, limit = 25 }) => {
+  try {
+    const { data } = await API.get("/api/search/discover", {
+      params: {
+        city,
+        limit,
+      },
+    });
+
+    return data;
+  } catch (error) {
+    console.error("❌ Error fetching discover data:", error);
+    throw error;
+  }
+};
+
+
 
 
 // import axios from "axios";

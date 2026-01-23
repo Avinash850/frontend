@@ -85,7 +85,14 @@ const ClinicForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
         area_id: safe(initialData.area_id),
 
         /* 🔽 NEW PREFILL */
-        rating: String(initialData.rating ?? "0"),
+        // rating:
+        //     initialData.rating === null || initialData.rating === undefined
+        //       ? "0"
+        //       : String(Number(initialData.rating).toFixed(1)).replace(/\.0$/, ""),
+
+        rating: normalizeRating(initialData.rating),
+
+
         patients_count: safe(initialData.patients_count),
         patients_stories: safe(initialData.patients_stories),
         payment_type: safe(initialData.payment_type),
@@ -142,6 +149,13 @@ const ClinicForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
     };
     load();
   }, []);
+
+  const normalizeRating = (v: any) => {
+  const n = Number(v);
+  if (isNaN(n)) return "0";
+  return (Math.round(n * 2) / 2).toString();
+};
+
 
   const handleImageChange = (file: File | null) => {
     if (!file) {
@@ -268,7 +282,7 @@ const ClinicForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
                   className="w-full px-3 py-2 border rounded-md"
                 >
                   {[0,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5].map(v => (
-                    <option key={v} value={v}>{v}</option>
+                    <option key={v} value={String(v)}>{v}</option>
                   ))}
                 </select>
               </div>

@@ -12,13 +12,54 @@ type Props = {
   onSaved?: (savedItem?: any) => void;
 };
 
-const emptyForm = {
-  id: null as number | null,
+type DoctorFormState = {
+  id: number | null;
+  name: string;
+  degree: string;
+  designation: string;
+  experience_years: number | "";
+  consultation_fee: number | "";
+  phone_1: string;
+  phone_2: string;
+  registration_number: string;
+  email: string;
+  rating: string;
+  short_description: string;
+  address: string;
+  description: string;
+  seo_title: string;
+  seo_keywords: string;
+  seo_description: string;
+  json_schema: string;
+  imageFile: File | null;
+  imagePreview: string;
+
+  gender: string;
+  patients_count: number | "";
+  is_profile_claimed: boolean;
+  is_on_call: boolean;
+
+  specializations: number[];
+  clinics: number[];
+  hospitals: number[];
+  procedures: number[];
+  services: number[];
+  symptoms: number[];
+  city_id: string | number;
+  area_id: string | number;
+  doctor_college: string;
+  pass_year: number | "";
+  doctor_council: string;
+  doctor_council_year: number | "";
+};
+
+const emptyForm: DoctorFormState = {
+  id: null,
   name: "",
   degree: "",
   designation: "",
-  experience_years: 0,
-  consultation_fee: 0,
+  experience_years: "",
+  consultation_fee: "",
   phone_1: "",
   phone_2: "",
   registration_number: "",
@@ -31,28 +72,30 @@ const emptyForm = {
   seo_keywords: "",
   seo_description: "",
   json_schema: "",
-  imageFile: null as File | null,
+  imageFile: null,
   imagePreview: "",
 
-  // ✅ NEW FIELDS
   gender: "male",
-  patients_count: 0,
+  patients_count: "",
   is_profile_claimed: false,
   is_on_call: false,
 
-  // relations
-  specializations: [] as number[],
-  clinics: [] as number[],
-  hospitals: [] as number[],
-  procedures: [] as number[],
-  services: [] as number[],
-  symptoms: [] as number[],
-  city_id: "" as string | number,
-  area_id: "" as string | number,
+  specializations: [],
+  clinics: [],
+  hospitals: [],
+  procedures: [],
+  services: [],
+  symptoms: [],
+  city_id: "",
+  area_id: "",
+  doctor_college: "",
+  pass_year: "",
+  doctor_council: "",
+  doctor_council_year: "",
 };
 
 const DoctorForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) => {
-  const [form, setForm] = useState({ ...emptyForm });
+  const [form, setForm] = useState<DoctorFormState>(emptyForm);
   const [loadingMasters, setLoadingMasters] = useState(false);
 
   const [specializations, setSpecializations] = useState<any[]>([]);
@@ -76,42 +119,94 @@ const DoctorForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
         id: initialData.id ?? null,
         name: initialData.name ?? "",
         degree: initialData.degree ?? "",
-        experience_years: initialData.experience_years ?? 0,
-        consultation_fee: initialData.consultation_fee ?? 0,
+        designation: initialData.designation ?? "",
+
+        experience_years:
+          initialData.experience_years === null ||
+          initialData.experience_years === undefined
+            ? ""
+            : Number(initialData.experience_years),
+
+        consultation_fee: initialData.consultation_fee === null ||  initialData.consultation_fee === undefined ? "" : Number(initialData.consultation_fee),
+
+        patients_count:
+          initialData.patients_count === null ||
+          initialData.patients_count === undefined
+            ? ""
+            : Number(initialData.patients_count),
+
+        rating: initialData.rating === null || initialData.rating === undefined
+            ? ""
+            : String(Number(initialData.rating).toFixed(1)).replace(/\.0$/, ""),
+
+
         phone_1: initialData.phone_1 ?? "",
         phone_2: initialData.phone_2 ?? "",
         registration_number: initialData.registration_number ?? "",
         email: initialData.email ?? "",
-        rating: initialData.rating ?? "",
-        designation: initialData.designation ?? "",
         short_description: initialData.short_description ?? "",
         address: initialData.address ?? "",
-        description: typeof initialData.description === "string" ? initialData.description : "",
+        description:
+          typeof initialData.description === "string"
+            ? initialData.description
+            : "",
+
         seo_title: initialData.seo_title ?? "",
         seo_keywords: initialData.seo_keywords ?? "",
         seo_description: initialData.seo_description ?? "",
         json_schema: initialData.json_schema ?? "",
+
         imageFile: null,
         imagePreview: initialData.image_url ?? "",
 
-        // ✅ NEW FIELDS (EDIT MODE)
         gender: initialData.gender ?? "male",
-        patients_count: initialData.patients_count ?? 0,
         is_profile_claimed: !!initialData.is_profile_claimed,
         is_on_call: !!initialData.is_on_call,
 
         specializations: Array.isArray(initialData.specializations)
-          ? initialData.specializations.map((s: any) => (typeof s === "object" ? s.id : s))
+          ? initialData.specializations.map((s: any) =>
+              typeof s === "object" ? s.id : s
+            )
           : [],
-        clinics: Array.isArray(initialData.clinics) ? initialData.clinics.map((c: any) => (typeof c === "object" ? c.id : c)) : [],
+
+        clinics: Array.isArray(initialData.clinics)
+          ? initialData.clinics.map((c: any) =>
+              typeof c === "object" ? c.id : c
+            )
+          : [],
+
         hospitals: Array.isArray(initialData.hospitals)
-          ? initialData.hospitals.map((h: any) => (typeof h === "object" ? h.id : h))
+          ? initialData.hospitals.map((h: any) =>
+              typeof h === "object" ? h.id : h
+            )
           : [],
-        procedures: Array.isArray(initialData.procedures) ? initialData.procedures.map((p: any) => (typeof p === "object" ? p.id : p)) : [],
-        services: Array.isArray(initialData.services) ? initialData.services.map((s: any) => (typeof s === "object" ? s.id : s)) : [],
-        symptoms: Array.isArray(initialData.symptoms) ? initialData.symptoms.map((s: any) => (typeof s === "object" ? s.id : s)) : [],
+
+        procedures: Array.isArray(initialData.procedures)
+          ? initialData.procedures.map((p: any) =>
+              typeof p === "object" ? p.id : p
+            )
+          : [],
+
+        services: Array.isArray(initialData.services)
+          ? initialData.services.map((s: any) =>
+              typeof s === "object" ? s.id : s
+            )
+          : [],
+
+        symptoms: Array.isArray(initialData.symptoms)
+          ? initialData.symptoms.map((s: any) =>
+              typeof s === "object" ? s.id : s
+            )
+          : [],
+
         city_id: initialData.city_id ?? "",
         area_id: initialData.area_id ?? "",
+        doctor_college: initialData.doctor_college ?? "",
+        // pass_year: initialData.pass_year ?? "",
+        doctor_council: initialData.doctor_council ?? "",
+        // doctor_council_year: initialData.doctor_council_year ?? "",
+         pass_year: initialData.pass_year === null ||  initialData.pass_year === undefined ? "" : Number(initialData.pass_year),
+         doctor_council_year: initialData.doctor_council_year === null ||  initialData.doctor_council_year === undefined ? "" : Number(initialData.doctor_council_year),
       }));
     }
   }, [initialData, mode]);
@@ -120,16 +215,33 @@ const DoctorForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
     const loadMasters = async () => {
       try {
         setLoadingMasters(true);
-        const [spRes, clRes, hRes, pRes, sRes, syRes, cityRes, areaRes] = await Promise.all([
-          fetch(`${import.meta.env.VITE_API_BASE_URL}/api/masters/specializations`).then((r) => r.json()),
-          fetch(`${import.meta.env.VITE_API_BASE_URL}/api/masters/clinics`).then((r) => r.json()),
-          fetch(`${import.meta.env.VITE_API_BASE_URL}/api/masters/hospitals`).then((r) => r.json()),
-          fetch(`${import.meta.env.VITE_API_BASE_URL}/api/masters/procedures`).then((r) => r.json()),
-          fetch(`${import.meta.env.VITE_API_BASE_URL}/api/masters/services`).then((r) => r.json()),
-          fetch(`${import.meta.env.VITE_API_BASE_URL}/api/masters/symptoms`).then((r) => r.json()),
-          fetch(`${import.meta.env.VITE_API_BASE_URL}/api/masters/cities`).then((r) => r.json()),
-          fetch(`${import.meta.env.VITE_API_BASE_URL}/api/masters/areas`).then((r) => r.json()),
-        ]);
+        const [spRes, clRes, hRes, pRes, sRes, syRes, cityRes, areaRes] =
+          await Promise.all([
+            fetch(
+              `${import.meta.env.VITE_API_BASE_URL}/api/masters/specializations`
+            ).then((r) => r.json()),
+            fetch(
+              `${import.meta.env.VITE_API_BASE_URL}/api/masters/clinics`
+            ).then((r) => r.json()),
+            fetch(
+              `${import.meta.env.VITE_API_BASE_URL}/api/masters/hospitals`
+            ).then((r) => r.json()),
+            fetch(
+              `${import.meta.env.VITE_API_BASE_URL}/api/masters/procedures`
+            ).then((r) => r.json()),
+            fetch(
+              `${import.meta.env.VITE_API_BASE_URL}/api/masters/services`
+            ).then((r) => r.json()),
+            fetch(
+              `${import.meta.env.VITE_API_BASE_URL}/api/masters/symptoms`
+            ).then((r) => r.json()),
+            fetch(
+              `${import.meta.env.VITE_API_BASE_URL}/api/masters/cities`
+            ).then((r) => r.json()),
+            fetch(
+              `${import.meta.env.VITE_API_BASE_URL}/api/masters/areas`
+            ).then((r) => r.json()),
+          ]);
 
         setSpecializations(Array.isArray(spRes) ? spRes : []);
         setClinics(Array.isArray(clRes) ? clRes : []);
@@ -165,13 +277,14 @@ const DoctorForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
     const payload: any = {
       name: form.name,
       degree: form.degree,
-      experience_years: form.experience_years,
-      consultation_fee: form.consultation_fee,
+      experience_years: form.experience_years === "" ? 0 : form.experience_years,
+      consultation_fee:
+        form.consultation_fee === "" ? 0 : form.consultation_fee,
       phone_1: form.phone_1,
       phone_2: form.phone_2,
       registration_number: form.registration_number,
       email: form.email,
-      rating: form.rating,
+      rating: form.rating === "" ? null : form.rating,
       designation: form.designation,
       short_description: form.short_description,
       address: form.address,
@@ -181,9 +294,8 @@ const DoctorForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
       seo_description: form.seo_description,
       json_schema: form.json_schema,
 
-      // ✅ NEW FIELDS
       gender: form.gender,
-      patients_count: form.patients_count,
+      patients_count: form.patients_count === "" ? 0 : form.patients_count,
       is_profile_claimed: form.is_profile_claimed,
       is_on_call: form.is_on_call,
 
@@ -195,6 +307,10 @@ const DoctorForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
       procedures: form.procedures,
       services: form.services,
       symptoms: form.symptoms,
+      doctor_college: form.doctor_college,
+      pass_year: form.pass_year,
+      doctor_council: form.doctor_council,
+      doctor_council_year: form.doctor_council_year,
     };
 
     if (mode === "add") {
@@ -243,11 +359,17 @@ const DoctorForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
               <div>
                 <label className="block text-sm font-medium mb-1">Experience Years</label>
                  <input
-                  type="number"
-                  value={form.experience_years}
-                  onChange={(e) => setForm({ ...form, experience_years: Number(e.target.value) })}
-                  className="w-full px-3 py-2 border rounded-md"
-                />
+                    type="number"
+                    min={0}
+                    value={form.experience_years}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        experience_years: e.target.value === "" ? "" : Number(e.target.value),
+                      })
+                    }
+                    className="w-full px-3 py-2 border rounded-md"
+                  />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Registration Number</label>
@@ -265,22 +387,61 @@ const DoctorForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
                   className="w-full px-3 py-2 border rounded-md"
                 />
               </div>
-              <div>
+              {/* <div>
                 <label className="block text-sm font-medium mb-1">Rating</label>
                 <input
+                    type="number"
+                    min={0}
+                    max={5}
+                    step={0.1}
+                    value={form.rating}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === "") {
+                        setForm({ ...form, rating: "" });
+                        return;
+                      }
+                      const num = Number(val);
+                      if (num >= 0 && num <= 5) {
+                        setForm({ ...form, rating: num });
+                      }
+                    }}
+                    className="w-full px-3 py-2 border rounded-md"
+                    placeholder="Enter 1 to 5 value"
+                  />
+
+              </div> */}
+
+               <div>
+                <label className="block text-sm font-medium mb-1">
+                  Rating
+                </label>
+                <select
                   value={form.rating}
-                  onChange={(e) => setForm({ ...form, rating: e.target.value })}
+                  onChange={e => setForm({ ...form, rating: e.target.value })}
                   className="w-full px-3 py-2 border rounded-md"
-                />
+                >
+                  {[0,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5].map(v => (
+                    <option key={v} value={String(v)}>
+                      {v}
+                    </option>
+                  ))}
+                </select>
               </div>
                <div>
                 <label className="block text-sm font-medium mb-1">Consultation Fee</label>
-                 <input
-                  type="number"
-                  value={form.consultation_fee}
-                  onChange={(e) => setForm({ ...form, consultation_fee: Number(e.target.value) })}
-                  className="w-full px-3 py-2 border rounded-md"
-                />
+                <input
+                    type="number"
+                    min={0}
+                    value={form.consultation_fee}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        consultation_fee: e.target.value === "" ? "" : Number(e.target.value),
+                      })
+                    }
+                    className="w-full px-3 py-2 border rounded-md"
+                  />
               </div>
             </div>
 
@@ -342,11 +503,17 @@ const DoctorForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
               <div>
                 <label className="block text-sm font-medium mb-1">Patients Count</label>
                 <input
-                  type="number"
-                  value={form.patients_count}
-                  onChange={(e) => setForm({ ...form, patients_count: Number(e.target.value) })}
-                  className="w-full px-3 py-2 border rounded-md"
-                />
+                    type="number"
+                    min={0}
+                    value={form.patients_count}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        patients_count: e.target.value === "" ? "" : Number(e.target.value),
+                      })
+                    }
+                    className="w-full px-3 py-2 border rounded-md"
+                  />
               </div>
 
               <div className="flex items-center gap-2 mt-6">
@@ -531,6 +698,58 @@ const DoctorForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
             className="w-full px-3 py-2 border rounded-md"
             rows={3}
           />
+        </div>
+        
+         {/* DOctor & Education */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Doctor College</label>
+            <input
+              value={form.doctor_college}
+              onChange={(e) => setForm({ ...form, doctor_college: e.target.value })}
+              className="w-full px-3 py-2 border rounded-md" placeholder="Doctor College"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Doctor Passing year</label>
+            <input
+                    type="number"
+                    min={0}
+                    value={form.pass_year}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        pass_year: e.target.value === "" ? "" : Number(e.target.value),
+                      })
+                    }
+                    className="w-full px-3 py-2 border rounded-md"
+                  />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Doctor Council</label>
+            <input
+              value={form.doctor_council}
+              onChange={(e) => setForm({ ...form, doctor_council: e.target.value })}
+              className="w-full px-3 py-2 border rounded-md" placeholder="Doctor Council"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Doctor Council year</label>
+             <input
+                    type="number"
+                    min={0}
+                    value={form.doctor_council_year}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        doctor_council_year: e.target.value === "" ? "" : Number(e.target.value),
+                      })
+                    }
+                    className="w-full px-3 py-2 border rounded-md"
+                  />
+          </div>
         </div>
 
         <div>

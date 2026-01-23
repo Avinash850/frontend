@@ -13,6 +13,7 @@ const SearchBox = ({ disabled }) => {
     selectedLocation,
     searchQuery,
     setSearchQuery,
+    setSelectedLocation,
   } = useContext(DoctorContext);
 
   /* ===================== LOCAL UI STATE ===================== */
@@ -100,25 +101,40 @@ const SearchBox = ({ disabled }) => {
     }
   };
 
-  const handleSelect = (item) => {
-    setQuery(item.name);
-    setShowList(false);
-    setUserTyping(false);
+const handleSelect = (item) => {
+  console.log("HANDLE SELECT FIRED", item);
 
-    const citySlug = getCitySlug();
+  setQuery(item.name);
+  setShowList(false);
+  setUserTyping(false);
 
-    // 🔥 NEW: intent handling
-    if (item.type === "intent") {
-      navigate(`/${citySlug}/${item.slug}`);
-      return;
+  const citySlug = getCitySlug(); // from selectedLocation (localStorage)
+
+  // ✅ INTENT SEARCH (UNCHANGED)
+  if (item.type === "intent") {
+    navigate(`/${citySlug}/${item.slug}`);
+    return;
+  }
+
+  // ✅ PROFILE TYPES → use entity city, NOT selectedLocation
+  if (["doctor", "hospital", "clinic"].includes(item.type)) {
+    const entityCitySlug = item.city_slug || citySlug;
+
+    // sync localStorage + location UI to profile city
+    if (item.city) {
+       setSelectedLocation(item.city);  
+      localStorage.setItem("selected_city", item.city);
     }
 
-    if (["doctor", "hospital", "clinic"].includes(item.type)) {
-      navigate(`/${citySlug}/${item.type}/${item.slug}`);
-    } else {
-      navigate(`/${citySlug}/${item.slug}`);
-    }
+    navigate(`/${entityCitySlug}/${item.type}/${item.slug}`);
+    return;
+  }
+
+  // ✅ SPECIALIZATION / SERVICE / SYMPTOM (unchanged)
+  navigate(`/${citySlug}/${item.slug}`);
 };
+
+
 
 
   const handleKeyDown = (e) => {
@@ -166,6 +182,18 @@ const SearchBox = ({ disabled }) => {
       <span>{item.name}</span>
     </div>
   );
+
+//   const renderItem = (item, icon) => (
+//   <div
+//     key={`${item.type}-${item.slug}`}
+//     onMouseDown={() => handleSelect(item)} // 🔥 FIX
+//     className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer"
+//   >
+//     {icon}
+//     <span>{item.name}</span>
+//   </div>
+// );
+
 
   const renderSection = (title, items, icon) => {
     if (!items.length) return null;

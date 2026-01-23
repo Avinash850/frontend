@@ -228,7 +228,7 @@ const DoctorsAdminPage: React.FC = () => {
                         </div>
                       </td>
 
-                      <td className="px-6 py-4 font-medium">{d.name}</td>
+                      <td className="px-6 py-4 font-medium"> Dr. {d.name}</td>
                       <td className="px-6 py-4 text-gray-600">{d.slug}</td>
 
                       <td className="px-6 py-4 text-right">

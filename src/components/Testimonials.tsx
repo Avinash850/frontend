@@ -49,7 +49,7 @@ const Testimonials = () => {
 
     return (
         <section className="py-16 bg-slate-50">
-            <div className="container mx-auto px-6">
+            <div className="container mx-auto px-6 lg:px-[10rem]">
                 <div className="text-center mb-12">
                      <h2 className="text-3xl font-bold text-slate-800">What Our Patients Say</h2>
                      <p className="mt-2 text-lg text-slate-600">Real experiences from families who found their trusted partner in us.</p>

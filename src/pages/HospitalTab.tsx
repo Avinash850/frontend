@@ -212,7 +212,6 @@
 
 
 
-
 import React, { useState } from "react";
 import { FaStar, FaPhone } from "react-icons/fa";
 import defaultImage from "../assets/images/default_icon.png";
@@ -223,8 +222,6 @@ const HospitalProfileTabs = ({ hospital }) => {
   const [showAllServices, setShowAllServices] = useState(false);
   const [showAllOverviewServices, setShowAllOverviewServices] = useState(false);
 
-
-  // IMAGE MODAL (used only for hospital photos)
   const [galleryImages, setGalleryImages] = useState(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
@@ -239,6 +236,21 @@ const HospitalProfileTabs = ({ hospital }) => {
     .toLowerCase()
     .replace(/\s+/g, "-");
 
+  /* ===== helper: text → slug ===== */
+  const toSlug = (text = "") =>
+    text
+      .toLowerCase()
+      .trim()
+      .replace(/&/g, "and")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
+
+  const handleServiceClick = (name) => {
+    if (!name || !citySlug) return;
+    navigate(`/${citySlug}/${toSlug(name)}`);
+  };
+
   const tabs = [
     { key: "overview", title: "Overview" },
     { key: "doctors", title: `Doctors (${doctors.length})` },
@@ -246,8 +258,6 @@ const HospitalProfileTabs = ({ hospital }) => {
     { key: "services", title: "Services" },
     { key: "questions", title: "Questions" },
   ];
-
-  /* ===================== OLD & CORRECT DOCTOR CARD ===================== */
 
   const renderDoctorCard = (doctor) => {
     const goToDoctorProfile = () => {
@@ -275,7 +285,7 @@ const HospitalProfileTabs = ({ hospital }) => {
             className="text-blue-600 font-semibold text-lg cursor-pointer hover:underline"
             onClick={goToDoctorProfile}
           >
-            {doctor.name}
+            Dr. {doctor.name}
           </h4>
 
           {doctor.specialization_name && (
@@ -325,7 +335,6 @@ const HospitalProfileTabs = ({ hospital }) => {
         ))}
       </div>
 
-      {/* CONTENT */}
       <div className="p-6 text-sm text-gray-700">
         {/* OVERVIEW */}
         {activeTab === "overview" && (
@@ -340,37 +349,27 @@ const HospitalProfileTabs = ({ hospital }) => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
-              {/* <div>
-                <h4 className="font-semibold mb-2">Timings</h4>
-                <p>{hospital.timing || ""}</p>
-              </div> */}
-
-              {/* <div>
-                <h4 className="font-semibold mb-2">Services</h4>
-                <ul className="grid grid-cols-2 gap-y-1">
-                  {services.map((s) => (
-                    <li key={s.id}>{s.name}</li>
-                  ))}
-                </ul>
-              </div> */}
-
-
-              {/* <div>
+              {/* SERVICES (OVERVIEW) */}
+              <div>
                 <h4 className="font-semibold mb-2">Services</h4>
 
                 <ul className="grid grid-cols-2 gap-y-1 text-sm text-gray-700">
                   {(showAllOverviewServices
                     ? services
-                    : services.slice(0, 12)
+                    : services.slice(0, 6)
                   ).map((s) => (
-                    <li key={s.id} className="flex items-start gap-1">
-                      <span>•</span>
-                      <span>{s.name}</span>
+                    <li
+                      key={s.id}
+                      onClick={() => handleServiceClick(s.name)}
+                      className="leading-snug line-clamp-2 cursor-pointer hover:text-blue-600"
+                      title={s.name}
+                    >
+                      {s.name}
                     </li>
                   ))}
                 </ul>
 
-                {services.length > 12 && (
+                {services.length > 6 && (
                   <button
                     onClick={() =>
                       setShowAllOverviewServices((prev) => !prev)
@@ -382,41 +381,13 @@ const HospitalProfileTabs = ({ hospital }) => {
                       : `View all (${services.length})`}
                   </button>
                 )}
-              </div> */}
-
-              <div>
-                  <h4 className="font-semibold mb-2">Services</h4>
-
-                  <ul className="grid grid-cols-2 gap-y-1 text-sm text-gray-700">
-                    {(showAllOverviewServices ? services : services.slice(0, 6)).map(
-                      (s) => (
-                        <li
-                          key={s.id}
-                          className="leading-snug line-clamp-2"
-                          title={s.name}
-                        >
-                          {s.name}
-                        </li>
-                      )
-                    )}
-                  </ul>
-
-                  {services.length > 6 && (
-                    <button
-                      onClick={() => setShowAllOverviewServices((prev) => !prev)}
-                      className="mt-2 text-blue-600 text-sm font-medium hover:underline"
-                    >
-                      {showAllOverviewServices
-                        ? "View less"
-                        : `View all (${services.length})`}
-                    </button>
-                  )}
               </div>
 
-               <div>
+              <div>
                 <h4 className="font-semibold mb-2">Timings</h4>
                 <p>{hospital.timing || ""}</p>
               </div>
+
               <div>
                 <h4 className="font-semibold mb-2">Photos</h4>
                 <div className="flex items-center gap-2">
@@ -449,11 +420,15 @@ const HospitalProfileTabs = ({ hospital }) => {
           </>
         )}
 
-        {/* DOCTORS — RESTORED OLD CODE */}
-        {/* {activeTab === "doctors" &&
-          (doctors.length > 0
+        {/* DOCTORS */}
+        {/* {activeTab === "doctors" && (
+          doctors.length > 0
             ? doctors.map(renderDoctorCard)
-            : <p className="text-gray-500">No doctors listed.</p>)} */}
+            : <p className="text-gray-500">No doctors listed.</p>
+        )} */}
+
+
+
 
             {activeTab === "doctors" && (
               <div>
@@ -509,7 +484,7 @@ const HospitalProfileTabs = ({ hospital }) => {
                                   navigate(`/${hospital.city_name?.toLowerCase()}/doctor/${doctor.slug}`)
                                 }
                               >
-                                {doctor.name}
+                                Dr. {doctor.name}
                               </h3>
 
                               {doctor.degree && (
@@ -576,32 +551,29 @@ const HospitalProfileTabs = ({ hospital }) => {
           </p>
         )}
 
-        {/* SERVICES */}
-        {/* {activeTab === "services" && (
-          <ul className="grid md:grid-cols-2 gap-3">
-            {services.map((s) => (
-              <li
-                key={s.id}
-                className="border border-gray-200 rounded-lg p-3 bg-gray-50"
-              >
-                {s.name}
-              </li>
-            ))}
-          </ul>
-        )} */}
 
-       {activeTab === "services" && (
+
+
+
+
+
+
+
+        {/* SERVICES TAB */}
+        {activeTab === "services" && (
           <div>
-            {/* SERVICES LIST */}
             <ul className="columns-1 md:columns-3 gap-x-8 list-disc list-inside space-y-2">
               {(showAllServices ? services : services.slice(0, 12)).map((s) => (
-                <li key={s.id} className="text-sm text-gray-700 break-inside-avoid">
+                <li
+                  key={s.id}
+                  onClick={() => handleServiceClick(s.name)}
+                  className="text-sm text-gray-700 break-inside-avoid cursor-pointer hover:text-blue-600"
+                >
                   {s.name}
                 </li>
               ))}
             </ul>
 
-            {/* VIEW ALL */}
             {services.length > 12 && (
               <button
                 onClick={() => setShowAllServices((prev) => !prev)}

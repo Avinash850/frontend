@@ -29,7 +29,7 @@ const DoctorCard = ({ doctor }) => {
         <div>
           <a href={doctorUrl}>
             <h2 className="text-sky-600 text-lg font-semibold hover:underline cursor-pointer">
-              {doctor.name}
+              Dr. {doctor.name}
             </h2>
           </a>
 

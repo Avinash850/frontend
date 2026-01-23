@@ -4,6 +4,7 @@ import "react-quill-new/dist/quill.snow.css";
 import MultiSelect from "./MultiSelect";
 import { hospitalService } from "../services/hospitalService";
 import { quillModules, quillFormats } from "@/editor/quillConfig";
+import { number } from "framer-motion";
 
 type Props = {
   mode: "add" | "edit";
@@ -18,8 +19,8 @@ const emptyForm = {
   timing: "",
   short_description: "",
   about: "",
-  phone_1: 0,
-  phone_2: 0,
+  phone_1: number,
+  phone_2: number,
   website: "",
   address: "",
   seo_title: "",
@@ -98,13 +99,20 @@ const HospitalForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) 
         // ✅ added prefill
         designation: safe(initialData.designation),
         payment_type: safe(initialData.payment_type),
-        rating: safe(initialData.rating),
+        rating: normalizeRating(initialData.rating),
         patients_count: safe(initialData.patients_count),
         patients_stories: safe(initialData.patients_stories),
         is_profile_claimed: Boolean(initialData.is_profile_claimed),
       });
     }
   }, [initialData, mode]);
+
+  const normalizeRating = (v: any) => {
+  const n = Number(v);
+  if (isNaN(n)) return "0";
+  return (Math.round(n * 2) / 2).toString();
+};
+
 
   useEffect(() => {
     const loadMasters = async () => {
@@ -204,7 +212,7 @@ const HospitalForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) 
     <div className="max-h-[80vh] overflow-y-auto px-1">
       <div className="space-y-4 pb-4">
         {/* BASIC FIELDS */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
           <div className="md:col-span-2 space-y-3">
             <div>
               <label className="block text-sm font-medium mb-1">Name*</label>
@@ -262,17 +270,24 @@ const HospitalForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) 
                 className="px-3 py-2 border rounded-md"
               />
 
-              <input
-                type="number"
-                placeholder="Payment Type"
-                value={form.payment_type}
-                onChange={(e) =>
-                  setForm({ ...form, payment_type: e.target.value })
-                }
-                className="px-3 py-2 border rounded-md"
-              />
+             <div>
+  <label className="block text-sm font-medium mb-1">Payment Type</label>
+  <select
+    value={form.payment_type}
+    onChange={(e) =>
+      setForm({ ...form, payment_type: e.target.value })
+    }
+    className="px-3 py-2 border rounded-md"
+  >
+    <option value="">Select Payment Type</option>
+    <option value="1">Online</option>
+    <option value="2">Cash</option>
+    <option value="3">Both Accepted</option>
+  </select>
+</div>
 
-              <input
+
+              {/* <input
                 type="number"
                 step="0.5"
                 min="1"
@@ -283,19 +298,53 @@ const HospitalForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) 
                   setForm({ ...form, rating: e.target.value })
                 }
                 className="px-3 py-2 border rounded-md"
-              />
+              /> */}
+              <div>
+  <label className="block text-sm font-medium mb-1">Rating</label>
+  <select
+    value={form.rating}
+    onChange={(e) =>
+      setForm({ ...form, rating: e.target.value })
+    }
+    className="px-3 py-2 border rounded-md"
+  >
+    {[0,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5].map(v => (
+      <option key={v} value={String(v)}>{v}</option>
+    ))}
+  </select>
+</div>
 
-              <input
-                type="number"
-                placeholder="Patients Count"
-                value={form.patients_count}
-                onChange={(e) =>
-                  setForm({ ...form, patients_count: e.target.value })
-                }
-                className="px-3 py-2 border rounded-md"
-              />
 
-              <input
+             <div>
+  <label className="block text-sm font-medium mb-1">
+    Total Patients
+  </label>
+  <input
+    type="number"
+    value={form.patients_count}
+    onChange={(e) =>
+      setForm({ ...form, patients_count: e.target.value })
+    }
+    className="px-3 py-2 border rounded-md"
+  />
+</div>
+
+<div>
+  <label className="block text-sm font-medium mb-1">
+    Patient Stories
+  </label>
+  <input
+    type="number"
+    value={form.patients_stories}
+    onChange={(e) =>
+      setForm({ ...form, patients_stories: e.target.value })
+    }
+    className="px-3 py-2 border rounded-md"
+  />
+</div>
+
+
+              {/* <input
                 type="number"
                 placeholder="Patients Stories"
                 value={form.patients_stories}
@@ -303,9 +352,9 @@ const HospitalForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) 
                   setForm({ ...form, patients_stories: e.target.value })
                 }
                 className="px-3 py-2 border rounded-md"
-              />
-
-              <label className="flex items-center gap-2 mt-2">
+              /> */}
+              <div>
+                   <label className="flex items-center gap-2 mt-2">
                 <input
                   type="checkbox"
                   checked={form.is_profile_claimed}
@@ -318,6 +367,8 @@ const HospitalForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) 
                 />
                 Profile Claimed
               </label>
+              </div>
+             
             </div>
           </div>
 

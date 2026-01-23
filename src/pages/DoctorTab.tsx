@@ -125,7 +125,7 @@ const DoctorProfileTabs = ({ doctor }) => {
             </p>
           </div> */}
           {/* MIDDLE */}
-          <div className="md:col-span-4 text-sm text-gray-700">
+          {/* <div className="md:col-span-4 text-sm text-gray-700">
             {item.is_on_call === 1 ? (
               <p className="font-medium">ON-CALL</p>
             ) : item.display_timing_days && item.display_timing_time ? (
@@ -137,6 +137,11 @@ const DoctorProfileTabs = ({ doctor }) => {
             : (
               <p className="font-medium">Available on appointment</p>
             )
+            }
+          </div> */}
+          <div className="md:col-span-4 text-sm text-gray-700">
+            {item.timing
+            
             }
           </div>
 

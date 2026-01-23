@@ -1,20 +1,29 @@
 import React, { useEffect, useState } from "react";
-import {FaCheckCircle,FaThumbsUp} from "react-icons/fa";
-import { useParams } from "react-router-dom";
+import { FaCheckCircle, FaThumbsUp } from "react-icons/fa";
+import { useParams, useNavigate } from "react-router-dom";
 import { HeroSearch } from "../components/HeroSearch";
 import defaultImage from "../assets/images/default_icon.png";
-import { getDoctorDetails } from "../services/doctorsService";
+import { getDoctorDetails, getSearchDiscover  } from "../services/doctorsService";
 import DoctorProfileTabs from "./DoctorTab";
 import BreadcrumbNav from "./BreadCrumbNav";
 import GetInTouchForm from "../components/GetInTouch";
 
 const DoctorProfile = () => {
   const { city, slug } = useParams();
+  const navigate = useNavigate();
+
   const [doctor, setDoctor] = useState(null);
+  const [seo, setSeo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [aboutExpanded, setAboutExpanded] = useState(false);
   const [showAllServices, setShowAllServices] = useState(false);
   const [showAllSpecializations, setShowAllSpecializations] = useState(false);
+  const [discover, setDiscover] = useState({
+  top_doctors: [],
+  top_services: [],
+  top_procedures: [],
+});
+
 
 
   useEffect(() => {
@@ -30,6 +39,15 @@ const DoctorProfile = () => {
           profile: true,
         });
         setDoctor(res?.items?.[0] || null);
+
+        // if (res?.seo) {
+        //   setSeo(res.seo);
+        // }
+
+        // ✅ NEW
+        const discoverRes = await getSearchDiscover({ city });
+        setDiscover(discoverRes);
+
       } catch {
         setDoctor(null);
       } finally {
@@ -39,6 +57,27 @@ const DoctorProfile = () => {
 
     fetchDoctor();
   }, [city, slug]);
+
+  /* ================= SEO EFFECT (ONLY ADDITION) ================= */
+  // useEffect(() => {
+  //   if (!seo) return;
+
+  //   // if (seo.title) {
+  //   //   document.title = seo.title;
+  //   // }
+
+  //   if (seo.description) {
+  //     let metaDesc = document.querySelector("meta[name='description']");
+  //     if (!metaDesc) {
+  //       metaDesc = document.createElement("meta");
+  //       metaDesc.setAttribute("name", "description");
+  //       document.head.appendChild(metaDesc);
+  //     }
+  //     metaDesc.setAttribute("content", seo.description);
+  //   }
+  // }, [seo]);
+  /* ============================================================= */
+  
 
   if (loading) {
     return <div className="text-center py-16 text-gray-500">Loading…</div>;
@@ -56,12 +95,27 @@ const DoctorProfile = () => {
     ? Math.round((doctor.rating / 5) * 100)
     : 0;
 
-  const aboutText = doctor.description || "";
+  const aboutText = doctor.short_description || "";
   const MAX_LENGTH = 180;
   const isLong = aboutText.length > MAX_LENGTH;
   const visibleText = aboutExpanded
     ? aboutText
     : aboutText.slice(0, MAX_LENGTH);
+
+  /* ===== helper: text → slug ===== */
+  const toSlug = (text = "") =>
+    text
+      .toLowerCase()
+      .trim()
+      .replace(/&/g, "and")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
+
+  const handleRedirect = (name) => {
+    if (!city || !name) return;
+    navigate(`/${city}/${toSlug(name)}`);
+  };
 
   return (
     <div className="max-w-7xl mx-auto my-8 px-4">
@@ -83,15 +137,14 @@ const DoctorProfile = () => {
             />
 
             <div className="flex-1">
-              {/* Name + claimed */}
               <div className="flex items-center gap-2">
                 <h1 className="text-2xl font-semibold">
-                  {doctor.name}
+                  Dr. {doctor.name}
                 </h1>
 
                 {doctor.is_profile_claimed === 1 && (
                   <span className="text-xs text-green-600 font-medium">
-                    Profile is claimed
+                    Verified Profile
                   </span>
                 )}
               </div>
@@ -119,7 +172,6 @@ const DoctorProfile = () => {
                 </div>
               )}
 
-              {/* Rating */}
               <div className="flex items-center gap-2 mt-3 text-sm">
                 <FaThumbsUp className="text-green-600" />
                 <span className="font-semibold text-green-700">
@@ -132,7 +184,6 @@ const DoctorProfile = () => {
                 )}
               </div>
 
-              {/* About */}
               {aboutText && (
                 <div className="mt-4 text-sm text-gray-700">
                   <p>
@@ -143,8 +194,7 @@ const DoctorProfile = () => {
                     <button
                       className="text-blue-600 mt-1"
                       onClick={() =>
-                        setAboutExpanded(!aboutExpanded)
-                      }
+                        setAboutExpanded(!aboutExpanded)}
                     >
                       {aboutExpanded ? "Read less" : "Read more"}
                     </button>
@@ -174,7 +224,13 @@ const DoctorProfile = () => {
                       ? doctor.services
                       : doctor.services.slice(0, 3)
                     ).map(service => (
-                      <li key={service.id}>{service.name}</li>
+                      <li
+                        key={service.id}
+                        onClick={() => handleRedirect(service.name)}
+                        className="cursor-pointer hover:text-blue-600"
+                      >
+                        {service.name}
+                      </li>
                     ))}
                   </ul>
 
@@ -190,33 +246,40 @@ const DoctorProfile = () => {
               )}
 
               {/* Specializations */}
-              {Array.isArray(doctor.specializations) && doctor.specializations.length > 0 && (
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-2">
-                    Specializations
-                  </h3>
+              {Array.isArray(doctor.specializations) &&
+                doctor.specializations.length > 0 && (
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-2">
+                      Specializations
+                    </h3>
 
-                  <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
-                    {(showAllSpecializations
-                      ? doctor.specializations
-                      : doctor.specializations.slice(0, 3)
-                    ).map(spec => (
-                      <li key={spec.id}>{spec.name}</li>
-                    ))}
-                  </ul>
+                    <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+                      {(showAllSpecializations
+                        ? doctor.specializations
+                        : doctor.specializations.slice(0, 3)
+                      ).map(spec => (
+                        <li
+                          key={spec.id}
+                          onClick={() => handleRedirect(spec.name)}
+                          className="cursor-pointer hover:text-blue-600"
+                        >
+                          {spec.name}
+                        </li>
+                      ))}
+                    </ul>
 
-                  {doctor.specializations.length > 3 && (
-                    <button
-                      className="text-blue-600 text-sm mt-1"
-                      onClick={() =>
-                        setShowAllSpecializations(!showAllSpecializations)
-                      }
-                    >
-                      {showAllSpecializations ? "View less" : "View all"}
-                    </button>
-                  )}
-                </div>
-              )}
+                    {doctor.specializations.length > 3 && (
+                      <button
+                        className="text-blue-600 text-sm mt-1"
+                        onClick={() =>
+                          setShowAllSpecializations(!showAllSpecializations)
+                        }
+                      >
+                        {showAllSpecializations ? "View less" : "View all"}
+                      </button>
+                    )}
+                  </div>
+                )}
 
               {/* Education */}
               {(doctor.degree ||
@@ -260,16 +323,89 @@ const DoctorProfile = () => {
               )}
 
             </div>
+            
           </div>
-
-        </div>
-
-        {/* Sidebar */}
-        <div className="lg:col-span-4">
-          <div className="sticky top-24">
+           <div className="sticky top-24">
             <GetInTouchForm />
           </div>
         </div>
+
+        {/* Sidebar */}
+        {/* <div className="lg:col-span-4">
+          <div className="sticky top-24">
+            <GetInTouchForm />
+          </div>
+        </div> */}
+
+        <div className="lg:col-span-4 space-y-6">
+
+          {/* Top Doctors */}
+          {discover.top_doctors.length > 0 && (
+            <div className="bg-white rounded-2xl shadow border p-5">
+              <h3 className="font-semibold mb-3">
+                Top Doctors in {city}
+              </h3>
+              <ul className="space-y-2 text-sm">
+                {discover.top_doctors.slice(0, 20).map(d => (
+                  <li
+                    key={d.id}
+                    className="text-blue-600 cursor-pointer hover:underline"
+                    onClick={() =>
+                      navigate(`/${city}/doctor/${d.slug}`)
+                    }
+                  >
+                    Dr. {d.name}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Top Services */}
+          {discover.top_services.length > 0 && (
+            <div className="bg-white rounded-2xl shadow border p-5">
+              <h3 className="font-semibold mb-3">
+                Top Services in {city}
+              </h3>
+              <ul className="space-y-2 text-sm">
+                {discover.top_services.slice(0, 20).map(s => (
+                  <li
+                    key={s.id}
+                    className="text-blue-600 cursor-pointer hover:underline"
+                    onClick={() =>
+                      navigate(`/${city}/${s.slug}`)
+                    }
+                  >
+                    {s.name}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Top Procedures */}
+          {discover.top_procedures.length > 0 && (
+            <div className="bg-white rounded-2xl shadow border p-5">
+              <h3 className="font-semibold mb-3">
+                Top Procedures in {city}
+              </h3>
+              <ul className="space-y-2 text-sm">
+                {discover.top_procedures.slice(0, 20).map(p => (
+                  <li
+                    key={p.id}
+                    className="text-blue-600 cursor-pointer hover:underline"
+                    onClick={() =>
+                      navigate(`/${city}/${p.slug}`)
+                    }
+                  >
+                    {p.name}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+      </div>
       </div>
     </div>
   );

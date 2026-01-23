@@ -1,45 +1,124 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FaStar, FaPhone } from "react-icons/fa";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { HeroSearch } from "../components/HeroSearch";
 import defaultImage from "../assets/images/default_icon.png";
-import { getDoctorDetails } from "../services/doctorsService";
+import { getDoctorDetails, getSearchDiscover } from "../services/doctorsService";
 import HospitalProfileTabs from "./HospitalTab";
 import BreadcrumbNav from "./BreadCrumbNav";
 import GetInTouchForm from "../components/GetInTouch";
 
 const HospitalProfile = () => {
   const { city, slug } = useParams();
+  const navigate = useNavigate();
+
   const [hospital, setHospital] = useState(null);
   const [loading, setLoading] = useState(true);
   const hasFetchedRef = useRef(false);
+
   const [showAllProcedures, setShowAllProcedures] = useState(false);
   const [showAllSpecializations, setShowAllSpecializations] = useState(false);
+  const [discover, setDiscover] = useState({ top_hospitals: [], top_procedures: [],
+});
 
 
-  useEffect(() => {
-    if (!city || !slug) return;
-    if (hasFetchedRef.current) return;
+  // useEffect(() => {
+  //   if (!city || !slug) return;
+  //   if (hasFetchedRef.current) return;
 
-    const fetchHospital = async () => {
-      try {
-        setLoading(true);
-        const res = await getDoctorDetails({
-          type: "hospital",
-          slug,
-          city,
-          profile: true,
-        });
-        setHospital(res?.items?.[0] || null);
-      } catch {
-        setHospital(null);
-      } finally {
-        setLoading(false);
-      }
-    };
+  //   const fetchHospital = async () => {
+  //     try {
+  //       setLoading(true);
+  //       const res = await getDoctorDetails({
+  //         type: "hospital",
+  //         slug,
+  //         city,
+  //         profile: true,
+  //       });
+  //       setHospital(res?.items?.[0] || null);
+  //     } catch {
+  //       setHospital(null);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    fetchHospital();
-  }, [city, slug]);
+  //   fetchHospital();
+  //   hasFetchedRef.current = true;
+  // }, [city, slug]);
+
+
+
+
+
+
+//   useEffect(() => {
+//   if (!city || !slug) return;
+//   if (hasFetchedRef.current) return;
+
+//   const fetchHospital = async () => {
+//     try {
+//       setLoading(true);
+
+//       const res = await getDoctorDetails({
+//         type: "hospital",
+//         slug,
+//         city,
+//         profile: true,
+//       });
+
+//       setHospital(res?.items?.[0] || null);
+
+//       // 👇 NEW: discovery call
+//       const discoverRes = await getSearchDiscover({ city });
+//       setDiscover(discoverRes);
+
+//     } catch {
+//       setHospital(null);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   fetchHospital();
+//   hasFetchedRef.current = true;
+// }, [city, slug]);
+
+
+
+
+useEffect(() => {
+  if (!city || !slug) return;
+
+  const fetchHospital = async () => {
+    try {
+      setLoading(true);
+      setHospital(null); // 👈 important reset
+
+      const res = await getDoctorDetails({
+        type: "hospital",
+        slug,
+        city,
+        profile: true,
+      });
+
+      setHospital(res?.items?.[0] || null);
+
+      // discovery can stay here
+      const discoverRes = await getSearchDiscover({ city });
+      setDiscover(discoverRes);
+
+    } catch (err) {
+      console.error(err);
+      setHospital(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchHospital();
+}, [city, slug]); // 👈 THIS is what makes it work
+
 
   if (loading) {
     return <div className="text-center py-16 text-gray-500">Loading…</div>;
@@ -55,6 +134,21 @@ const HospitalProfile = () => {
 
   const rating = hospital.rating > 0 ? hospital.rating : 3.5;
 
+  /* ===== helper: name → slug ===== */
+  const toSlug = (text = "") =>
+    text
+      .toLowerCase()
+      .trim()
+      .replace(/&/g, "and")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
+
+  const handleRedirect = (name) => {
+    if (!city || !name) return;
+    navigate(`/${city}/${toSlug(name)}`);
+  };
+
   return (
     <div className="max-w-7xl mx-auto my-8 px-4">
       <HeroSearch />
@@ -63,12 +157,10 @@ const HospitalProfile = () => {
         <BreadcrumbNav profileData={hospital} profileType="hospital" />
       </div>
 
-      {/* 70 / 30 GRID — same as Doctor */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* LEFT CARD */}
+        {/* LEFT */}
         <div className="lg:col-span-8 bg-white p-6 rounded-2xl shadow border">
           <div className="flex flex-col md:flex-row gap-6">
-            {/* Left content */}
             <div className="flex gap-6">
               <img
                 src={hospital.image_url || defaultImage}
@@ -88,7 +180,6 @@ const HospitalProfile = () => {
                   </p>
                 )}
 
-                {/* Rating */}
                 <div className="flex items-center gap-2 mt-3 text-sm">
                   <span className="text-green-600 font-medium">
                     {rating}
@@ -135,7 +226,6 @@ const HospitalProfile = () => {
               </div>
             </div>
 
-            {/* Call Now — inside card */}
             {hospital.phone_1 && (
               <div className="flex items-end">
                 <a
@@ -153,48 +243,50 @@ const HospitalProfile = () => {
             <HospitalProfileTabs hospital={hospital} />
           </div>
 
-          {/* Procedures in Hospital */}
-          {Array.isArray(hospital.procedures) && hospital.procedures.length > 0 && (
-            <div className="mt-6 bg-white rounded-2xl shadow border p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                Procedures in {hospital.name}
-              </h2>
+          {/* Procedures */}
+          {Array.isArray(hospital.procedures) &&
+            hospital.procedures.length > 0 && (
+              <div className="mt-6 bg-white rounded-2xl shadow border p-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                  Procedures in {hospital.name}
+                </h2>
 
-              <div className="flex flex-wrap gap-2">
-                {(showAllProcedures
-                  ? hospital.procedures
-                  : hospital.procedures.slice(0, 5)
-                ).map(proc => (
-                  <span
-                    key={proc.id}
-                    className="px-4 py-2 bg-gray-100 text-sm rounded-full text-gray-800"
-                  >
-                    {proc.name}
-                  </span>
-                ))}
+                <div className="flex flex-wrap gap-2">
+                  {(showAllProcedures
+                    ? hospital.procedures
+                    : hospital.procedures.slice(0, 5)
+                  ).map(proc => (
+                    <button
+                      key={proc.id}
+                      onClick={() => handleRedirect(proc.name)}
+                      className="px-4 py-2 bg-gray-100 text-sm rounded-full text-gray-800 hover:bg-gray-200 cursor-pointer"
+                    >
+                      {proc.name}
+                    </button>
+                  ))}
 
-                {hospital.procedures.length > 5 && !showAllProcedures && (
+                  {hospital.procedures.length > 5 && !showAllProcedures && (
+                    <button
+                      className="px-4 py-2 text-sm text-blue-600"
+                      onClick={() => setShowAllProcedures(true)}
+                    >
+                      +{hospital.procedures.length - 5} procedures
+                    </button>
+                  )}
+                </div>
+
+                {showAllProcedures && (
                   <button
-                    className="px-4 py-2 text-sm text-blue-600"
-                    onClick={() => setShowAllProcedures(true)}
+                    className="text-blue-600 text-sm mt-3"
+                    onClick={() => setShowAllProcedures(false)}
                   >
-                    +{hospital.procedures.length - 5} procedures
+                    View less
                   </button>
                 )}
               </div>
+            )}
 
-              {showAllProcedures && (
-                <button
-                  className="text-blue-600 text-sm mt-3"
-                  onClick={() => setShowAllProcedures(false)}
-                >
-                  View less
-                </button>
-              )}
-            </div>
-          )}
-
-          {/* Specialists in Hospital */}
+          {/* Specialists */}
           {Array.isArray(hospital.specializations) &&
             hospital.specializations.length > 0 && (
               <div className="mt-6 bg-white rounded-2xl shadow border p-6">
@@ -207,15 +299,16 @@ const HospitalProfile = () => {
                     ? hospital.specializations
                     : hospital.specializations.slice(0, 6)
                   ).map(spec => (
-                    <span
+                    <button
                       key={spec.id}
-                      className="px-4 py-2 bg-gray-100 text-sm rounded-full text-gray-800"
+                      onClick={() => handleRedirect(spec.name)}
+                      className="px-4 py-2 bg-gray-100 text-sm rounded-full text-gray-800 hover:bg-gray-200 cursor-pointer"
                     >
                       {spec.name}
                       {spec.doctors_count
                         ? ` (${spec.doctors_count})`
                         : ""}
-                    </span>
+                    </button>
                   ))}
 
                   {hospital.specializations.length > 6 &&
@@ -238,15 +331,64 @@ const HospitalProfile = () => {
                   </button>
                 )}
               </div>
-          )}
-        </div>
+            )}
 
-        {/* RIGHT */}
-        <div className="lg:col-span-4">
-          <div className="sticky top-24">
+             <div className="sticky top-24">
             <GetInTouchForm />
           </div>
         </div>
+
+        {/* RIGHT DISCOVERY PANEL */}
+          <div className="lg:col-span-4 space-y-6">
+
+            {/* Top Hospitals */}
+            {discover.top_hospitals.length > 0 && (
+              <div className="bg-white rounded-2xl shadow border p-5">
+                <h3 className="font-semibold text-gray-900 mb-3">
+                  Top Hospitals in {city}
+                </h3>
+
+                <ul className="space-y-2 text-sm">
+                  {discover.top_hospitals.slice(0, 20).map(h => (
+                    <li
+                      key={h.id}
+                      className="text-blue-600 hover:underline cursor-pointer"
+                      onClick={() =>
+                        navigate(`/${city}/hospital/${h.slug}`)
+                      }
+                    >
+                      {h.name}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Top Procedures */}
+            {discover.top_procedures.length > 0 && (
+              <div className="bg-white rounded-2xl shadow border p-5">
+                <h3 className="font-semibold text-gray-900 mb-3">
+                  Top Procedures in {city}
+                </h3>
+
+                <ul className="space-y-2 text-sm">
+                  {discover.top_procedures.slice(0, 20).map(p => (
+                    <li
+                      key={p.id}
+                      className="text-blue-600 hover:underline cursor-pointer"
+                      onClick={() =>
+                        navigate(`/${city}/${p.slug}`)
+                      }
+                    >
+                      {p.name}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+          </div>
+
       </div>
     </div>
   );

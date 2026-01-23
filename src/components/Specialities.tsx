@@ -5,6 +5,8 @@ import laparoscopy from '../assets/images/Specialities/icons/laparoscopy.png'
 import urology from '../assets/images/Specialities/icons/urology.png'
 import ent from '../assets/images/Specialities/icons/ent.png'
 import aesthetics from '../assets/images/Specialities/icons/aesthetics.png'
+import male from '../assets/images/consultation/male-infertility.png';
+import female from '../assets/images/consultation/female-infertility.png';
 
 
 const specialities = [
@@ -36,19 +38,33 @@ const specialities = [
         bgColor: 'bg-amber-100',
         url: `${import.meta.env.VITE_FRONTEND_URL}/delhi/urologist`
     },
+    // {
+    //     name: 'ENT (Ear, Nose, Throat)',
+    //     description: 'Minimal access surgery (MIS) for ear, nose and throat...',
+    //     icon: ent,
+    //     bgColor: 'bg-red-100',
+    //     url: `${import.meta.env.VITE_FRONTEND_URL}/delhi/Otolaryngologist`
+    // },
+    // {
+    //     name: 'Aesthetics',
+    //     description: 'Reconstruction or improvement of physical appearance...',
+    //     icon: aesthetics,
+    //     bgColor: 'bg-purple-100',
+    //     url: `${import.meta.env.VITE_FRONTEND_URL}/delhi/aesthetic`
+    // },
     {
-        name: 'ENT (Ear, Nose, Throat)',
+        name: 'Male Infertility',
         description: 'Minimal access surgery (MIS) for ear, nose and throat...',
         icon: ent,
         bgColor: 'bg-red-100',
-        url: `${import.meta.env.VITE_FRONTEND_URL}/delhi/Otolaryngologist`
+        url: `${import.meta.env.VITE_FRONTEND_URL}/delhi/icsi-male-infertility`
     },
     {
-        name: 'Aesthetics',
+        name: 'Female Infertility',
         description: 'Reconstruction or improvement of physical appearance...',
         icon: aesthetics,
         bgColor: 'bg-purple-100',
-        url: `${import.meta.env.VITE_FRONTEND_URL}/delhi/aesthetic`
+        url: `${import.meta.env.VITE_FRONTEND_URL}/delhi/icsi-female-infertility`
     }
 ];
 
@@ -102,15 +118,17 @@ const SpecialityCard = ({ name, description, icon, bgColor, url }) => {
 const Specialities = () => {
     return (
         <section className="py-12 sm:py-16 bg-slate-100">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 className="text-2xl sm:text-3xl font-bold text-center text-slate-800 mb-8 sm:mb-12">
-                    Our Specialities
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-                    {specialities.map((speciality, index) => (
-                        <SpecialityCard key={index} {...speciality} />
-                    ))}
-                </div>
+            <div className="container mx-auto px-4 sm:px-6 xl:px-[10rem]">
+                {/* <div className='px-[4rem]'> */}
+                    <h2 className="text-2xl sm:text-3xl font-bold text-center text-slate-800 mb-8 sm:mb-12">
+                        Our Specialities
+                    </h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                        {specialities.map((speciality, index) => (
+                            <SpecialityCard key={index} {...speciality} />
+                        ))}
+                    </div>
+                {/* </div> */}
             </div>
         </section>
     );

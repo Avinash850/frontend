@@ -112,7 +112,7 @@ const ClinicProfileTabs = ({ clinic }) => {
               Doctors in {clinic.name}
             </h2>
 
-            <div className="space-y-6">
+            {/* <div className="space-y-6">
               {doctors.length > 0 ? (
                 doctors.map((doctor) => (
                   <div
@@ -120,7 +120,7 @@ const ClinicProfileTabs = ({ clinic }) => {
                     className="border border-gray-200 rounded-xl p-6"
                   >
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                      {/* LEFT */}
+                    
                       <div className="md:col-span-7 flex gap-4">
                         <img
                           src={doctor.image_url || defaultImage}
@@ -156,7 +156,7 @@ const ClinicProfileTabs = ({ clinic }) => {
                         </div>
                       </div>
 
-                      {/* RIGHT */}
+                     
                       <div className="md:col-span-5 text-sm space-y-2">
                         {doctor.patients_count > 0 && (
                           <p>💬 {doctor.patients_count} Patient Stories</p>
@@ -172,7 +172,7 @@ const ClinicProfileTabs = ({ clinic }) => {
                           <p>🕒 {doctor.timings}</p>
                         )}
 
-                        {/* ACTION BUTTONS */}
+                        
                         <div className="flex gap-3 mt-4">
                           <button className="border border-blue-600 text-blue-600 px-4 py-2 rounded-md text-sm">
                             Contact Clinic
@@ -191,7 +191,111 @@ const ClinicProfileTabs = ({ clinic }) => {
                   No doctors listed for this clinic.
                 </p>
               )}
-            </div>
+            </div> */}
+
+            {/* FILTER BAR (UI only, logic later) */}
+                            <div className="border border-gray-200 rounded-lg p-4 mb-6">
+                              <p className="text-sm text-gray-600 mb-2">
+                                Filter specialties…
+                              </p>
+            
+                              <div className="flex flex-wrap gap-2">
+                                <button className="px-4 py-1 text-sm rounded-full bg-blue-600 text-white">
+                                  All ({doctors.length})
+                                </button>
+                                
+                                {Array.from(
+                                  new Set(doctors.map(d => d.designation).filter(Boolean))
+                                ).map((spec, i) => (
+                                  <button
+                                    key={i}
+                                    className="px-4 py-1 text-sm rounded-full bg-gray-100 text-gray-700"
+                                  >
+                                    {spec}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+            
+                            {/* DOCTOR LIST */}
+                              <div className="space-y-6">
+                                {doctors.map((doctor) => (
+                                  <div
+                                    key={doctor.id}
+                                    className="border border-gray-200 rounded-xl p-6"
+                                  >
+                                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                                      {/* LEFT */}
+                                      <div className="md:col-span-7 flex gap-4">
+                                        <img
+                                          src={doctor.image_url || defaultImage}
+                                          alt={doctor.name}
+                                          className="w-24 h-24 object-cover rounded border"
+                                        />
+            
+                                        <div>
+                                          <h3
+                                            className="text-blue-600 font-semibold text-lg cursor-pointer hover:underline"
+                                            onClick={() =>
+                                              navigate(`/${hospital.city_name?.toLowerCase()}/doctor/${doctor.slug}`)
+                                            }
+                                          >
+                                            Dr. {doctor.name}
+                                          </h3>
+            
+                                          {doctor.degree && (
+                                            <p className="text-sm">{doctor.degree}</p>
+                                          )}
+            
+                                          {doctor.experience_years && (
+                                            <p className="text-sm text-gray-600">
+                                              {doctor.experience_years} years experience overall
+                                            </p>
+                                          )}
+            
+                                          {doctor.designation && (
+                                            <p className="text-sm text-gray-600">
+                                              {doctor.designation}
+                                            </p>
+                                          )}
+                                        </div>
+                                      </div>
+            
+                                      {/* RIGHT */}
+                                      <div className="md:col-span-5 text-sm space-y-2">
+                                        {doctor.patients_count > 0 && (
+                                          <p>
+                                            💬 {doctor.patients_count} Patient Stories
+                                          </p>
+                                        )}
+            
+                                        {doctor.consultation_fee && (
+                                          <p className="font-semibold">
+                                            ₹{doctor.consultation_fee}
+                                          </p>
+                                        )}
+            
+                                        {doctor.timings && (
+                                          <p>
+                                            🕒 {doctor.timings}
+                                          </p>
+                                        )}
+            
+                                        {/* ACTION BUTTONS */}
+                                        <div className="flex gap-3 mt-4">
+                                          <button className="border border-blue-600 text-blue-600 px-4 py-2 rounded-md text-sm">
+                                            Contact Clinic
+                                          </button>
+            
+                                          <button className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm">
+                                            Book Clinic Visit
+                                          </button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
           </div>
         )}
 
