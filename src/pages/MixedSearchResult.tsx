@@ -231,126 +231,118 @@ const MixedSearchResults = () => {
               );
             }
 
-            if (entity_type === "hospital" || entity_type === "clinic") {
-              const totalDoctors = data.preview_doctors?.length || 0;
+         if (entity_type === "hospital" || entity_type === "clinic") {
+  const totalDoctors = data.preview_doctors?.length || 0;
+  const scrollId = `doctor-scroll-${data.id}`;
 
-              const visibleDoctors =
-                data.preview_doctors?.slice(
-                  doctorIndex,
-                  doctorIndex + VISIBLE_DOCTORS
-                ) || [];
+  return (
+    <div
+      key={`${entity_type}-${data.id}`}
+      className="bg-white p-6 rounded-xl shadow-sm mb-6"
+    >
+      <div className="flex justify-between">
+        <div className="flex gap-4">
+          <img
+            src={data.image_url?.trim() || defaultImage}
+            className="w-20 h-20 object-contain border rounded"
+            onError={(e) => (e.currentTarget.src = defaultImage)}
+          />
 
-              return (
-                <div
-                  key={`${entity_type}-${data.id}`}
-                  className="bg-white p-6 rounded-xl shadow-sm mb-6"
-                >
-                  <div className="flex justify-between">
-                    <div className="flex gap-4">
-                      <img
-                        src={data.image_url?.trim() || defaultImage}
-                        className="w-20 h-20 object-contain border rounded"
-                        onError={(e) => (e.currentTarget.src = defaultImage)}
-                      />
+          <div>
+            <h3
+              onClick={() => goToProfile(entity_type, data.slug)}
+              className="text-lg font-semibold text-blue-600 cursor-pointer"
+            >
+              {data.name}
+            </h3>
 
-                      <div>
-                        <h3
-                          onClick={() => goToProfile(entity_type, data.slug)}
-                          className="text-lg font-semibold text-blue-600 cursor-pointer"
-                        >
-                          {data.name}
-                        </h3>
+            <p className="text-sm text-gray-600">
+              {entity_type === "hospital"
+                ? "Multi-speciality Hospital"
+                : "Clinic"}{" "}
+              • {data.area_name}, {data.city_name}
+            </p>
 
-                        <p className="text-sm text-gray-600">
-                          {entity_type === "hospital"
-                            ? "Multi-speciality Hospital"
-                            : "Clinic"}{" "}
-                          • {data.area_name}, {data.city_name}
-                        </p>
+            <p className="text-sm text-green-600 mt-1">
+              {data.timing || "Timings available"}
+            </p>
+          </div>
+        </div>
 
-                        <p className="text-sm text-green-600 mt-1">
-                          {data.timing || "Timings available"}
-                        </p>
-                      </div>
-                    </div>
+        <div className="text-right">
+          <div className="flex items-center gap-1 justify-end">
+            <FaStar className="text-green-600" />
+            <span>{Number(data.rating) > 0 ? data.rating : 4}</span>
+          </div>
 
-                    <div className="text-right">
-                      <div className="flex items-center gap-1 justify-end">
-                        <FaStar className="text-green-600" />
-                        <span>{Number(data.rating) > 0 ? data.rating : 4}</span>
-                      </div>
+          <button
+            onClick={() => goToProfile(entity_type, data.slug)}
+            className="mt-3 px-4 py-2 bg-blue-600 text-white rounded"
+          >
+            View Profile
+          </button>
+        </div>
+      </div>
 
-                      <button
-                        onClick={() => goToProfile(entity_type, data.slug)}
-                        className="mt-3 px-4 py-2 bg-blue-600 text-white rounded"
-                      >
-                        View Profile
-                      </button>
-                    </div>
-                  </div>
+      {totalDoctors > 0 && (
+        <div className="relative mt-4">
+          {totalDoctors > VISIBLE_DOCTORS && (
+            <button
+              onClick={() =>
+                document
+                  .getElementById(scrollId)
+                  ?.scrollBy({ left: -220, behavior: "smooth" })
+              }
+              className="absolute -left-3 top-1/2 -translate-y-1/2 bg-white border rounded-full w-8 h-8 shadow disabled:opacity-30"
+            >
+              ‹
+            </button>
+          )}
 
-                  {totalDoctors > 0 && (
-                    <div className="relative mt-4">
-                      {totalDoctors > VISIBLE_DOCTORS && (
-                        <button
-                          onClick={() =>
-                            setDoctorIndex((i) => Math.max(i - 1, 0))
-                          }
-                          disabled={doctorIndex === 0}
-                          className="absolute -left-3 top-1/2 -translate-y-1/2 bg-white border rounded-full w-8 h-8 shadow disabled:opacity-30"
-                        >
-                          ‹
-                        </button>
-                      )}
+          <div
+            id={scrollId}
+            className="flex gap-4 overflow-x-auto scroll-smooth no-scrollbar"
+          >
+            {data.preview_doctors.map((doc) => (
+              <div
+                key={doc.id}
+                onClick={() => goToProfile("doctor", doc.slug)}
+                className="border rounded-lg p-3 w-44 cursor-pointer hover:shadow flex-shrink-0"
+              >
+                <img
+                  src={doc.image_url || defaultImage}
+                  className="w-12 h-12 rounded-full"
+                  onError={(e) =>
+                    (e.currentTarget.src = defaultImage)
+                  }
+                />
+                <p className="text-sm font-semibold mt-1">
+                  {doc.name}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {doc.specialization_name}
+                </p>
+              </div>
+            ))}
+          </div>
 
-                      <div className="flex gap-4">
-                        {visibleDoctors.map((doc) => (
-                          <div
-                            key={doc.id}
-                            onClick={() =>
-                              goToProfile("doctor", doc.slug)
-                            }
-                            className="border rounded-lg p-3 w-44 cursor-pointer hover:shadow"
-                          >
-                            <img
-                              src={doc.image_url || defaultImage}
-                              className="w-12 h-12 rounded-full"
-                              onError={(e) =>
-                                (e.currentTarget.src = defaultImage)
-                              }
-                            />
-                            <p className="text-sm font-semibold mt-1">
-                              {doc.name}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              {doc.specialization_name}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-
-                      {totalDoctors > VISIBLE_DOCTORS && (
-                        <button
-                          onClick={() =>
-                            setDoctorIndex((i) =>
-                              i + VISIBLE_DOCTORS < totalDoctors
-                                ? i + 1
-                                : i
-                            )
-                          }
-                          disabled={
-                            doctorIndex + VISIBLE_DOCTORS >= totalDoctors
-                          }
-                          className="absolute -right-3 top-1/2 -translate-y-1/2 bg-white border rounded-full w-8 h-8 shadow disabled:opacity-30"
-                        >
-                          ›
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              );
-            }
+          {totalDoctors > VISIBLE_DOCTORS && (
+            <button
+              onClick={() =>
+                document
+                  .getElementById(scrollId)
+                  ?.scrollBy({ left: 220, behavior: "smooth" })
+              }
+              className="absolute -right-3 top-1/2 -translate-y-1/2 bg-white border rounded-full w-8 h-8 shadow disabled:opacity-40"
+            >
+              ›
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
             return null;
           })}

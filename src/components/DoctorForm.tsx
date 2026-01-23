@@ -274,44 +274,46 @@ const DoctorForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
       return;
     }
 
-    const payload: any = {
-      name: form.name,
-      degree: form.degree,
-      experience_years: form.experience_years === "" ? 0 : form.experience_years,
-      consultation_fee:
-        form.consultation_fee === "" ? 0 : form.consultation_fee,
-      phone_1: form.phone_1,
-      phone_2: form.phone_2,
-      registration_number: form.registration_number,
-      email: form.email,
-      rating: form.rating === "" ? null : form.rating,
-      designation: form.designation,
-      short_description: form.short_description,
-      address: form.address,
-      description: form.description,
-      seo_title: form.seo_title,
-      seo_keywords: form.seo_keywords,
-      seo_description: form.seo_description,
-      json_schema: form.json_schema,
+const payload: any = {
+  name: form.name,
+  degree: form.degree,
+  experience_years: form.experience_years === "" ? null : form.experience_years,
+  consultation_fee: form.consultation_fee === "" ? null : form.consultation_fee,
+  phone_1: form.phone_1,
+  phone_2: form.phone_2,
+  registration_number: form.registration_number,
+  email: form.email,
+  rating: form.rating === "" ? null : Number(form.rating),
+  designation: form.designation,
+  short_description: form.short_description,
+  address: form.address,
+  description: form.description,
+  seo_title: form.seo_title,
+  seo_keywords: form.seo_keywords,
+  seo_description: form.seo_description,
+  json_schema: form.json_schema,
 
-      gender: form.gender,
-      patients_count: form.patients_count === "" ? 0 : form.patients_count,
-      is_profile_claimed: form.is_profile_claimed,
-      is_on_call: form.is_on_call,
+  gender: form.gender,
+  patients_count: form.patients_count === "" ? null : form.patients_count,
+  is_profile_claimed: form.is_profile_claimed,
+  is_on_call: form.is_on_call,
 
-      city_id: form.city_id || null,
-      area_id: form.area_id || null,
-      specializations: form.specializations,
-      clinics: form.clinics,
-      hospitals: form.hospitals,
-      procedures: form.procedures,
-      services: form.services,
-      symptoms: form.symptoms,
-      doctor_college: form.doctor_college,
-      pass_year: form.pass_year,
-      doctor_council: form.doctor_council,
-      doctor_council_year: form.doctor_council_year,
-    };
+  city_id: form.city_id || null,
+  area_id: form.area_id || null,
+
+  doctor_college: form.doctor_college,
+  pass_year: form.pass_year === "" ? null : form.pass_year,
+  doctor_council: form.doctor_council,
+  doctor_council_year:
+    form.doctor_council_year === "" ? null : form.doctor_council_year,
+
+  specializations: form.specializations,
+  clinics: form.clinics,
+  hospitals: form.hospitals,
+  procedures: form.procedures,
+  services: form.services,
+  symptoms: form.symptoms,
+};
 
     if (mode === "add") {
       await doctorService.createDoctor(payload, form.imageFile);
