@@ -15,6 +15,7 @@ const MixedSearchResults = () => {
   const navigate = useNavigate();
   const { setLocationQuery, setSearchQuery } = useContext(DoctorContext);
   const [doctorIndex, setDoctorIndex] = useState(0);
+  const [doctorIndexMap, setDoctorIndexMap] = useState({});
 
 
   const [items, setItems] = useState([]);
@@ -29,6 +30,8 @@ const MixedSearchResults = () => {
   const [page, setPage] = useState(1);
   const limit = 10;
   const loaderRef = useRef(null);
+  const CARD_WIDTH = 200;
+  const CARD_GAP = 20;
 
   useEffect(() => {
     if (!city) return;
@@ -103,9 +106,8 @@ const MixedSearchResults = () => {
       .join(" ");
 
   const headingText = meta
-    ? `${meta.total} ${formatKeyword(meta.keyword)}${
-        meta.total === 1 ? "" : "s"
-      } available in ${city}`
+    ? `${meta.total} ${formatKeyword(meta.keyword)}${meta.total === 1 ? "" : "s"
+    } available in ${city}`
     : "";
 
   if (loading) {
@@ -120,7 +122,7 @@ const MixedSearchResults = () => {
         <div className="lg:col-span-8">
 
           {/* FILTERS (doctor only) */}
-          {(meta.intent === "doctor"  && 
+          {(meta.intent === "doctor" &&
             <div className="flex flex-wrap gap-4 mb-6 bg-white p-4 rounded-xl shadow-sm">
               <select value={gender} onChange={(e) => setGender(e.target.value)} className="border rounded px-3 py-2 text-sm">
                 <option value="">Gender</option>
@@ -231,118 +233,143 @@ const MixedSearchResults = () => {
               );
             }
 
-         if (entity_type === "hospital" || entity_type === "clinic") {
-  const totalDoctors = data.preview_doctors?.length || 0;
-  const scrollId = `doctor-scroll-${data.id}`;
+            if (entity_type === "hospital" || entity_type === "clinic") {
+              const totalDoctors = data.preview_doctors?.length || 0;
+              const scrollId = `doctor-scroll-${data.id}`;
 
-  return (
-    <div
-      key={`${entity_type}-${data.id}`}
-      className="bg-white p-6 rounded-xl shadow-sm mb-6"
-    >
-      <div className="flex justify-between">
-        <div className="flex gap-4">
-          <img
-            src={data.image_url?.trim() || defaultImage}
-            className="w-20 h-20 object-contain border rounded"
-            onError={(e) => (e.currentTarget.src = defaultImage)}
-          />
+              return (
+                <div
+                  key={`${entity_type}-${data.id}`}
+                  className="bg-white p-6 rounded-xl shadow-sm mb-6"
+                >
+                  <div className="flex justify-between">
+                    <div className="flex gap-4">
+                      <img
+                        src={data.image_url?.trim() || defaultImage}
+                        className="w-20 h-20 object-contain border rounded"
+                        onError={(e) => (e.currentTarget.src = defaultImage)}
+                      />
 
-          <div>
-            <h3
-              onClick={() => goToProfile(entity_type, data.slug)}
-              className="text-lg font-semibold text-blue-600 cursor-pointer"
-            >
-              {data.name}
-            </h3>
+                      <div>
+                        <h3
+                          onClick={() => goToProfile(entity_type, data.slug)}
+                          className="text-lg font-semibold text-blue-600 cursor-pointer"
+                        >
+                          {data.name}
+                        </h3>
 
-            <p className="text-sm text-gray-600">
-              {entity_type === "hospital"
-                ? "Multi-speciality Hospital"
-                : "Clinic"}{" "}
-              • {data.area_name}, {data.city_name}
-            </p>
+                        <p className="text-sm text-gray-600">
+                          {entity_type === "hospital"
+                            ? "Multi-speciality Hospital"
+                            : "Clinic"}{" "}
+                          • {data.area_name}, {data.city_name}
+                        </p>
 
-            <p className="text-sm text-green-600 mt-1">
-              {data.timing || "Timings available"}
-            </p>
-          </div>
-        </div>
+                        <p className="text-sm text-green-600 mt-1">
+                          {data.timing || "Timings available"}
+                        </p>
+                      </div>
+                    </div>
 
-        <div className="text-right">
-          <div className="flex items-center gap-1 justify-end">
-            <FaStar className="text-green-600" />
-            <span>{Number(data.rating) > 0 ? data.rating : 4}</span>
-          </div>
+                    <div className="text-right">
+                      <div className="flex items-center gap-1 justify-end">
+                        <FaStar className="text-green-600" />
+                        <span>{Number(data.rating) > 0 ? data.rating : 4}</span>
+                      </div>
 
-          <button
-            onClick={() => goToProfile(entity_type, data.slug)}
-            className="mt-3 px-4 py-2 bg-blue-600 text-white rounded"
-          >
-            View Profile
-          </button>
-        </div>
-      </div>
+                      <button
+                        onClick={() => goToProfile(entity_type, data.slug)}
+                        className="mt-3 px-4 py-2 bg-blue-600 text-white rounded"
+                      >
+                        View Profile
+                      </button>
+                    </div>
+                  </div>
 
-      {totalDoctors > 0 && (
-        <div className="relative mt-4">
-          {totalDoctors > VISIBLE_DOCTORS && (
-            <button
-              onClick={() =>
-                document
-                  .getElementById(scrollId)
-                  ?.scrollBy({ left: -220, behavior: "smooth" })
-              }
-              className="absolute -left-3 top-1/2 -translate-y-1/2 bg-white border rounded-full w-8 h-8 shadow disabled:opacity-30"
-            >
-              ‹
-            </button>
-          )}
+                  {totalDoctors > 0 && (
+                    <div className="relative mt-5 flex justify-center">
 
-          <div
-            id={scrollId}
-            className="flex gap-4 overflow-x-auto scroll-smooth no-scrollbar"
-          >
-            {data.preview_doctors.map((doc) => (
-              <div
-                key={doc.id}
-                onClick={() => goToProfile("doctor", doc.slug)}
-                className="border rounded-lg p-3 w-44 cursor-pointer hover:shadow flex-shrink-0"
-              >
-                <img
-                  src={doc.image_url || defaultImage}
-                  className="w-12 h-12 rounded-full"
-                  onError={(e) =>
-                    (e.currentTarget.src = defaultImage)
-                  }
-                />
-                <p className="text-sm font-semibold mt-1">
-                  {doc.name}
-                </p>
-                <p className="text-xs text-gray-500">
-                  {doc.specialization_name}
-                </p>
-              </div>
-            ))}
-          </div>
 
-          {totalDoctors > VISIBLE_DOCTORS && (
-            <button
-              onClick={() =>
-                document
-                  .getElementById(scrollId)
-                  ?.scrollBy({ left: 220, behavior: "smooth" })
-              }
-              className="absolute -right-3 top-1/2 -translate-y-1/2 bg-white border rounded-full w-8 h-8 shadow disabled:opacity-40"
-            >
-              ›
-            </button>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
+                      {/* LEFT ARROW */}
+                      {totalDoctors > VISIBLE_DOCTORS && (
+                        <button
+                          onClick={() =>
+                            setDoctorIndexMap((prev) => ({
+                              ...prev,
+                              [data.id]: Math.max((prev[data.id] || 0) - 1, 0),
+                            }))
+                          }
+                          className="absolute left-5 top-1/2 -translate-y-1/2
+                   bg-white border rounded-full w-8 h-8 shadow z-10"
+                        >
+                          ‹
+                        </button>
+                      )}
+
+                      {/* FIXED VIEWPORT (EXACTLY 3 CARDS) */}
+                      <div
+                        className="mx-auto overflow-hidden"
+                        style={{
+                          width:
+                            VISIBLE_DOCTORS * CARD_WIDTH +
+                            (VISIBLE_DOCTORS - 1) * CARD_GAP,
+                        }}
+                      >
+                        <div
+                          className="flex transition-transform duration-300 ease-out"
+                          style={{
+                            gap: `${CARD_GAP}px`,
+                            transform: `translateX(-${(doctorIndexMap[data.id] || 0) *
+                              (CARD_WIDTH + CARD_GAP)
+                              }px)`,
+                          }}
+                        >
+                          {data.preview_doctors.map((doc) => (
+                            <div
+                              key={doc.id}
+                              onClick={() => goToProfile("doctor", doc.slug)}
+                              className="border rounded-xl p-3 cursor-pointer hover:shadow flex-shrink-0"
+                              style={{ width: CARD_WIDTH }}
+                            >
+                              <img
+                                src={doc.image_url || defaultImage}
+                                className="w-16 h-18 rounded-full"
+                                onError={(e) => (e.currentTarget.src = defaultImage)}
+                              />
+                              <p className="text-sm font-semibold mt-1 truncate">
+                                {doc.name}
+                              </p>
+                              <p className="text-xs text-gray-500 truncate">
+                                {doc.specialization_name}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* RIGHT ARROW */}
+                      {totalDoctors > VISIBLE_DOCTORS && (
+                        <button
+                          onClick={() =>
+                            setDoctorIndexMap((prev) => ({
+                              ...prev,
+                              [data.id]: Math.min(
+                                (prev[data.id] || 0) + 1,
+                                totalDoctors - VISIBLE_DOCTORS
+                              ),
+                            }))
+                          }
+                          className="absolute right-4 top-1/2 -translate-y-1/2
+                   bg-white border rounded-full w-8 h-8 shadow z-10"
+                        >
+                          ›
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            }
 
             return null;
           })}
