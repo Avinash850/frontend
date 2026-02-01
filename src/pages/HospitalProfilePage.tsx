@@ -7,6 +7,7 @@ import { getDoctorDetails, getSearchDiscover } from "../services/doctorsService"
 import HospitalProfileTabs from "./HospitalTab";
 import BreadcrumbNav from "./BreadCrumbNav";
 import GetInTouchForm from "../components/GetInTouch";
+import usePageTitle from "../hooks/usePageTitle";
 
 const HospitalProfile = () => {
   const { city, slug } = useParams();
@@ -119,6 +120,13 @@ useEffect(() => {
   fetchHospital();
 }, [city, slug]); // 👈 THIS is what makes it work
 
+usePageTitle(
+  hospital
+    ? `${hospital.name} | Hospital in ${hospital.area_name}, ${hospital.city_name}`
+    : "Hospital"
+);
+
+
 
   if (loading) {
     return <div className="text-center py-16 text-gray-500">Loading…</div>;
@@ -211,7 +219,7 @@ useEffect(() => {
                   {hospital.address}
                 </p>
 
-                {(hospital.display_address || hospital.address) && (
+                {/* {(hospital.display_address || hospital.address) && (
                   <a
                     href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
                       hospital.display_address || hospital.address
@@ -222,11 +230,11 @@ useEffect(() => {
                   >
                     Get Directions
                   </a>
-                )}
+                )} */}
               </div>
             </div>
 
-            {hospital.phone_1 && (
+            {hospital.phone_1 && hospital.show_call_button === 1 && (
               <div className="flex items-end">
                 <a
                   href={`tel:${hospital.phone_1}`}
@@ -334,13 +342,14 @@ useEffect(() => {
             )}
 
              <div className="sticky top-24">
-            <GetInTouchForm />
+            {/* <GetInTouchForm /> */}
           </div>
         </div>
 
         {/* RIGHT DISCOVERY PANEL */}
           <div className="lg:col-span-4 space-y-6">
-
+               <GetInTouchForm />
+            
             {/* Top Hospitals */}
             {discover.top_hospitals.length > 0 && (
               <div className="bg-white rounded-2xl shadow border p-5">

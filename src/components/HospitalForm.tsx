@@ -19,8 +19,8 @@ const emptyForm = {
   timing: "",
   short_description: "",
   about: "",
-  phone_1: number,
-  phone_2: number,
+  phone_1: "",
+  phone_2: "",
   website: "",
   address: "",
   seo_title: "",
@@ -42,6 +42,7 @@ const emptyForm = {
   patients_count: "",
   patients_stories: "",
   is_profile_claimed: false,
+  show_call_button: false,
 };
 
 const HospitalForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) => {
@@ -103,6 +104,7 @@ const HospitalForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) 
         patients_count: safe(initialData.patients_count),
         patients_stories: safe(initialData.patients_stories),
         is_profile_claimed: Boolean(initialData.is_profile_claimed),
+        show_call_button: Boolean(initialData.show_call_button),
       });
     }
   }, [initialData, mode]);
@@ -166,8 +168,9 @@ const HospitalForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) 
     payload.append("timing", form.timing || "");
     payload.append("short_description", form.short_description || "");
     payload.append("about", form.about || "");
-    payload.append("phone_1", form.phone_1 || 0);
-    payload.append("phone_2", form.phone_2 || 0);
+    payload.append("phone_1", form.phone_1 || "");
+    payload.append("phone_2", form.phone_2 || "");
+
     payload.append("website", form.website || "");
     payload.append("address", form.address || "");
 
@@ -190,6 +193,7 @@ const HospitalForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) 
     payload.append("patients_count", String(form.patients_count || 0));
     payload.append("patients_stories", String(form.patients_stories || 0));
     payload.append("is_profile_claimed", form.is_profile_claimed ? "1" : "0");
+    payload.append("show_call_button", form.show_call_button ? "1" : "0");
 
     if (form.imageFile) payload.append("image", form.imageFile);
 
@@ -368,6 +372,21 @@ const HospitalForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) 
                 Profile Claimed
               </label>
               </div>
+              <div>
+                   <label className="flex items-center gap-2 mt-2">
+                <input
+                  type="checkbox"
+                  checked={form.show_call_button}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      show_call_button: e.target.checked,
+                    })
+                  }
+                />
+                Show Call Button
+              </label>
+              </div>
              
             </div>
           </div>
@@ -409,7 +428,7 @@ const HospitalForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) 
         </div>
           
          <div className="grid grid-cols-2 gap-3">
-              <div>
+              {/* <div>
                 <label className="block text-sm font-medium mb-1">Phone No 1</label>
                  <input
                   type="number"
@@ -426,7 +445,42 @@ const HospitalForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) 
                   onChange={(e) => setForm({ ...form, phone_2: Number(e.target.value) })}
                   className="w-full px-3 py-2 border rounded-md"
                 />
-              </div>
+              </div> */}
+
+              <div>
+  <label className="block text-sm font-medium mb-1">Phone No 1</label>
+  <input
+    type="tel"
+    inputMode="numeric"
+    pattern="[0-9]*"
+    value={form.phone_1}
+    onChange={(e) =>
+      setForm({
+        ...form,
+        phone_1: e.target.value.replace(/\D/g, ""),
+      })
+    }
+    className="w-full px-3 py-2 border rounded-md"
+  />
+</div>
+
+<div>
+  <label className="block text-sm font-medium mb-1">Phone No 2</label>
+  <input
+    type="tel"
+    inputMode="numeric"
+    pattern="[0-9]*"
+    value={form.phone_2}
+    onChange={(e) =>
+      setForm({
+        ...form,
+        phone_2: e.target.value.replace(/\D/g, ""),
+      })
+    }
+    className="w-full px-3 py-2 border rounded-md"
+  />
+</div>
+
                <div>
                 <label className="block text-sm font-medium mb-1">Website</label>
                 <input

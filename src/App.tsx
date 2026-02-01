@@ -25,6 +25,7 @@ import BlogsAdminPage from "./pages/admin/BlogsAdminPage";
 import ClinicsAdminPage from "./pages/admin/ClinicsAdminPage";
 import CompanyAdminPage from "./pages/admin/CompanyAdminPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import About from "./pages/About";
 
 const App = () => {
   return (
@@ -60,6 +61,7 @@ const App = () => {
         <Route path="/blogs/:slug" element={<Layout><BlogDetailPage /></Layout>} />
         <Route path="/video-consult" element={<Layout><VideoConsultPage /></Layout>} />
         <Route path="/lab-tests" element={<Layout><LabTest /></Layout>} />
+        <Route path="/about" element={<Layout><About /></Layout>} />
 
         {/* ===================== PROFILES (MOST SPECIFIC) ===================== */}
         <Route path="/:city/doctor/:slug" element={<Layout><DoctorProfile /></Layout>} />

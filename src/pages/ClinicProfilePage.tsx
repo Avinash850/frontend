@@ -10,6 +10,7 @@ import {
 import BreadcrumbNav from "./BreadCrumbNav";
 import GetInTouchForm from "../components/GetInTouch";
 import ClinicProfileTabs from "./ClinicTab";
+import usePageTitle from "../hooks/usePageTitle";
 
 const ClinicProfile = () => {
   const { city, slug } = useParams();
@@ -64,6 +65,13 @@ const ClinicProfile = () => {
 
     fetchClinic();
   }, [city, slug]);
+
+  usePageTitle(
+  clinic
+    ? `${clinic.name} | Clinic in ${clinic.area_name}, ${clinic.city_name}`
+    : "Clinic"
+);
+
 
   if (loading) {
     return <div className="text-center py-16 text-gray-500">Loading…</div>;
@@ -142,7 +150,7 @@ const ClinicProfile = () => {
                   {clinic.address}
                 </p>
 
-                {(clinic.display_address || clinic.address) && (
+                {/* {(clinic.display_address || clinic.address) && (
                   <a
                     href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
                       clinic.display_address || clinic.address
@@ -153,12 +161,12 @@ const ClinicProfile = () => {
                   >
                     Get Directions
                   </a>
-                )}
+                )} */}
               </div>
             </div>
 
             {/* CALL */}
-            {clinic.phone_1 && (
+            {clinic.phone_1 && clinic.show_call_button ===1 &&(
               <div className="flex items-end">
                 <a
                   href={`tel:${clinic.phone_1}`}
@@ -177,14 +185,14 @@ const ClinicProfile = () => {
           </div>
 
           {/* GET IN TOUCH (moved below left, same as hospital) */}
-          <div className="mt-6">
+          {/* <div className="mt-6">
             <GetInTouchForm />
-          </div>
+          </div> */}
         </div>
 
         {/* RIGHT DISCOVERY PANEL */}
         <div className="lg:col-span-4 space-y-6">
-
+             <GetInTouchForm />
           {/* Top Clinics */}
           {discover.top_clinics?.length > 0 && (
             <div className="bg-white rounded-2xl shadow border p-5">

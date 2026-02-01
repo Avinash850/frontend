@@ -37,6 +37,7 @@ const emptyForm = {
   patients_stories: "",
   payment_type: "",
   is_profile_claimed: false,
+  show_call_button: false,
 
   specializations: [] as number[],
   services: [] as number[],
@@ -97,6 +98,7 @@ const ClinicForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
         patients_stories: safe(initialData.patients_stories),
         payment_type: safe(initialData.payment_type),
         is_profile_claimed: Boolean(Number(initialData.is_profile_claimed)),
+        show_call_button: Boolean(Number(initialData.show_call_button)),
 
         specializations: Array.isArray(initialData.specializations)
           ? initialData.specializations.map((s: any) =>
@@ -193,6 +195,10 @@ const ClinicForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
     payload.append(
       "is_profile_claimed",
       form.is_profile_claimed ? "1" : "0"
+    );
+    payload.append(
+      "show_call_button",
+      form.show_call_button ? "1" : "0"
     );
 
     if (form.city_id) payload.append("city_id", String(form.city_id));
@@ -355,6 +361,19 @@ const ClinicForm: React.FC<Props> = ({ mode, initialData, onClose, onSaved }) =>
                 }
               />
               <label className="text-sm">Profile Claimed</label>
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={form.show_call_button}
+                onChange={e =>
+                  setForm({
+                    ...form,
+                    show_call_button: e.target.checked,
+                  })
+                }
+              />
+              <label className="text-sm">Show call button </label>
             </div>
           </div>
 

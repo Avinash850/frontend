@@ -19,7 +19,6 @@ const GetInTouch = ({ variant = "full" }: Props) => {
   const [message, setMessage] = useState("");
   const [cities, setCities] = useState<{ id: number; name: string }[]>([]);
   const [services, setServices] = useState<{ id: number; name: string }[]>([]);
-
   const [loading, setLoading] = useState(false);
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -77,68 +76,59 @@ const GetInTouch = ({ variant = "full" }: Props) => {
     }
   };
 
+  const inputClass = `w-full bg-slate-100 rounded-md border border-slate-200
+    focus:ring-1 focus:ring-indigo-500
+    ${isCompact ? "px-2 py-1.5 text-xs" : "px-3 py-2 text-sm sm:text-base"}`;
+
   return (
-    <section className={`${isCompact ? "" : "py-8 sm:py-16 bg-slate-50"}`}>
-      <div
-        className={`${isCompact ? "" : "container mx-auto px-3 sm:px-6 max-w-4xl"}`}
-      >
-        {/* Heading */}
-        <div className={`text-center ${isCompact ? "mb-4" : "mb-8 sm:mb-12"}`}>
+    <section className={`${isCompact ? "" : "bg-slate-50"}`}>
+      <div className={`${isCompact ? "" : "container mx-auto px-3 max-w-4xl"}`}>
+        <div className={`text-center ${isCompact ? "mb-2" : "mb-2"}`}>
           <h2
-            className={`font-bold text-slate-800 ${isCompact
-                ? "text-lg"
-                : "text-xl sm:text-3xl md:text-4xl"
+            className={`font-semibold text-slate-800 ${
+              isCompact ? "text-base" : "text-lg sm:text-2xl"
             }`}
           >
-            Get in Touch
+            Enquire Now
           </h2>
-          {/* <p
-            className={`mt-2 text-slate-600 ${isCompact ? "text-sm" : "text-sm sm:text-lg"
-            }`}
-          >
-            Ready to take the next step? Our experts are here to help.
-          </p> */}
         </div>
 
-        {/* Form Card */}
         <div
-          className={`bg-white rounded-2xl shadow-xl ${isCompact ? "p-4" : "p-4 sm:p-8 md:p-10"
+          className={`bg-white rounded-xl shadow-lg ${
+            isCompact ? "p-3" : "p-3 sm:p-6 md:p-8"
           }`}
         >
           <form onSubmit={handleSubmit}>
             <div
-              className={`grid grid-cols-1 ${isCompact ? "gap-3" : "md:grid-cols-2 gap-3 sm:gap-6"
+              className={`grid grid-cols-1 ${
+                isCompact ? "gap-2" : "md:grid-cols-2 gap-3 sm:gap-5"
               }`}
             >
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Patient Name *"
-                className={`w-full bg-slate-100 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500 ${isCompact ? "p-2 text-sm" : "p-2 sm:p-3 text-sm sm:text-base"
-                }`}
+                className={inputClass}
               />
 
               <input
                 value={mobile}
                 onChange={(e) => setMobile(e.target.value)}
                 placeholder="Mobile Number *"
-                className={`w-full bg-slate-100 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500 ${isCompact ? "p-2 text-sm" : "p-2 sm:p-3 text-sm sm:text-base"
-                }`}
+                className={inputClass}
               />
 
               <input
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email *"
-                className={`w-full bg-slate-100 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500 ${isCompact ? "p-2 text-sm" : "p-2 sm:p-3 text-sm sm:text-base"
-                }`}
+                className={inputClass}
               />
 
               <select
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                className={`w-full bg-slate-100 rounded-lg border border-slate-200 ${isCompact ? "p-2 text-sm" : "p-2 sm:p-3 text-sm sm:text-base"
-                }`}
+                className={inputClass}
               >
                 <option value="">Select City</option>
                 {cities.map((c) => (
@@ -147,15 +137,16 @@ const GetInTouch = ({ variant = "full" }: Props) => {
                   </option>
                 ))}
               </select>
-              <select value={service} onChange={(e) => {
+
+              <select
+                value={service}
+                onChange={(e) => {
                   setService(e.target.value);
                   setShowOtherService(e.target.value === "Other");
                 }}
-                className={`w-full bg-slate-100 border border-slate-200 rounded-lg appearance-none leading-none ${
-                  isCompact
-                    ? "h-10 px-3 text-sm"
-                    : "h-12 px-4 text-base"
-                }`}
+                className={`w-full bg-slate-100 border border-slate-200 rounded-md
+                  ${isCompact ? "h-9 px-2 text-xs" : "h-11 px-3 text-sm sm:text-base"}
+                `}
               >
                 <option value="">Select Service *</option>
                 <option value="General Inquiry">General Inquiry</option>
@@ -168,30 +159,32 @@ const GetInTouch = ({ variant = "full" }: Props) => {
               </select>
 
               {showOtherService && (
-                <input value={otherService} onChange={(e) => setOtherService(e.target.value)}
+                <input
+                  value={otherService}
+                  onChange={(e) => setOtherService(e.target.value)}
                   placeholder="Enter your service *"
-                  className={`w-full bg-slate-100 rounded-lg border border-slate-200 ${isCompact ? "p-2 text-sm" : "p-2 sm:p-3 text-sm sm:text-base"
-                  }`}
+                  className={inputClass}
                 />
               )}
-              <textarea value={message}
+
+              <textarea
+                value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Message (Optional)"
-                className={`w-full bg-slate-100 rounded-lg border border-slate-200 h-24
-    ${isCompact ? "p-2 text-sm md:col-span-2" : "p-2 sm:p-3 text-sm sm:text-base md:col-span-2"}
+                className={`w-full bg-slate-100 rounded-md border border-slate-200
+                  ${isCompact ? "h-16 px-2 py-1.5 text-xs md:col-span-2" : "h-24 px-3 py-2 text-sm sm:text-base md:col-span-2"}
                 `}
               />
-
             </div>
 
-            <div className="pt-4">
+            <div className="pt-3">
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full bg-gradient-to-r from-indigo-600 to-rose-500 text-white font-bold rounded-lg ${isCompact
-                    ? "py-2 text-sm"
-                    : "py-2.5 sm:py-3 text-base sm:text-lg"
-                }`}
+                className={`w-full bg-gradient-to-r from-indigo-600 to-rose-500
+                  text-white font-semibold rounded-md
+                  ${isCompact ? "py-2 text-xs" : "py-2 sm:py-2.5 text-sm sm:text-base"}
+                `}
               >
                 {loading ? "Submitting..." : "Book Free Appointment"}
               </button>
@@ -199,12 +192,12 @@ const GetInTouch = ({ variant = "full" }: Props) => {
           </form>
 
           {infoMessage && (
-            <p className="text-center text-green-600 mt-4 text-sm">
+            <p className="text-center text-green-600 mt-3 text-xs sm:text-sm">
               {infoMessage}
             </p>
           )}
           {error && (
-            <p className="text-center text-red-600 mt-4 text-sm">
+            <p className="text-center text-red-600 mt-3 text-xs sm:text-sm">
               {error}
             </p>
           )}

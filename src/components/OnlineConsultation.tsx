@@ -120,13 +120,13 @@ const OnlineConsultation = () => {
                                 {spec.name}
                             </h3>
 
-                            <a
+                            {/* <a
                                 href={spec.url}
                                 onClick={(e) => e.stopPropagation()}
                                 className="text-indigo-600 font-semibold mt-2 text-sm hover:underline"
                             >
                                 CONSULT NOW
-                            </a>
+                            </a> */}
                         </div>
                     ))}
                 </div>

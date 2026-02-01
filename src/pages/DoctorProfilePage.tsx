@@ -7,6 +7,7 @@ import { getDoctorDetails, getSearchDiscover  } from "../services/doctorsService
 import DoctorProfileTabs from "./DoctorTab";
 import BreadcrumbNav from "./BreadCrumbNav";
 import GetInTouchForm from "../components/GetInTouch";
+import usePageTitle from "../hooks/usePageTitle";
 
 const DoctorProfile = () => {
   const { city, slug } = useParams();
@@ -57,6 +58,13 @@ const DoctorProfile = () => {
 
     fetchDoctor();
   }, [city, slug]);
+  
+  usePageTitle(
+  doctor
+    ? `Dr. ${doctor.name} | ${doctor.specialization_name} in ${doctor.area_name}, ${doctor.city_name}`
+    : "Doctor Profile"
+);
+
 
   /* ================= SEO EFFECT (ONLY ADDITION) ================= */
   // useEffect(() => {
@@ -325,20 +333,14 @@ const DoctorProfile = () => {
             </div>
             
           </div>
-           <div className="sticky top-24">
+           {/* <div className="sticky top-24">
             <GetInTouchForm />
-          </div>
+          </div> */}
         </div>
 
         {/* Sidebar */}
-        {/* <div className="lg:col-span-4">
-          <div className="sticky top-24">
-            <GetInTouchForm />
-          </div>
-        </div> */}
-
-        <div className="lg:col-span-4 space-y-6">
-
+       <div className="lg:col-span-4 space-y-6">
+           <GetInTouchForm />
           {/* Top Doctors */}
           {discover.top_doctors.length > 0 && (
             <div className="bg-white rounded-2xl shadow border p-5">

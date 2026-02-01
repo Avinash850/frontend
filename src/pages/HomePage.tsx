@@ -9,6 +9,7 @@ import FAQ from '../components/FAQ';
 // import Blogs from '../components/Blogs';
 import GetInTouch from '../components/GetInTouch';
 
+
 const HomePage = () => (
     <>
         <Hero />
@@ -21,7 +22,7 @@ const HomePage = () => (
             <Testimonials />
             <FAQ />
             {/* <Blogs /> */}
-            <GetInTouch />
+            {/* <GetInTouch /> */}
         </div>
     </>
 );

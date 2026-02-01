@@ -7,6 +7,7 @@ import GetInTouch from "../components/GetInTouch";
 import defaultImage from "../assets/images/default_icon.png";
 import { DoctorContext } from "../context/DoctorContextProvider";
 import { FaCheckCircle } from "react-icons/fa";
+import usePageTitle from "../hooks/usePageTitle";
 
 const VISIBLE_DOCTORS = 3;
 
@@ -105,10 +106,32 @@ const MixedSearchResults = () => {
       .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
       .join(" ");
 
+  const formatLocation = (value = "") =>
+  value
+    .split("-")
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(" ");
+
+
+  // const headingText = meta
+  //   ? `${meta.total} ${formatKeyword(meta.keyword)}${meta.total === 1 ? "" : "s"
+  //   } available in ${city}`
+  //   : "";
+
+  const formattedCity = formatLocation(city);
+  const formattedArea = area ? formatLocation(area) : null;
+
+  const locationText = formattedArea
+    ? `${formattedArea}, ${formattedCity}`
+    : formattedCity;
+
   const headingText = meta
-    ? `${meta.total} ${formatKeyword(meta.keyword)}${meta.total === 1 ? "" : "s"
-    } available in ${city}`
+    ? `${meta.total} ${formatKeyword(meta.keyword)}${
+        meta.total === 1 ? "" : "s"
+      } available in ${locationText}`
     : "";
+    
+  usePageTitle(headingText || "Search Doctors");
 
   if (loading) {
     return <div className="text-center py-16 text-gray-500">Loading…</div>;

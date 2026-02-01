@@ -75,7 +75,7 @@ const DoctorProfileTabs = ({ doctor }) => {
               {item.display_address || item.address}
             </p>
 
-            <a
+            {/* <a
               href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
                 item.display_address || item.address || ""
               )}`}
@@ -84,7 +84,7 @@ const DoctorProfileTabs = ({ doctor }) => {
               className="text-sm text-blue-600 mt-1 inline-block"
             >
               Get Directions
-            </a>
+            </a> */}
 
             {/* Images */}
             {images.length > 0 && (
@@ -218,7 +218,7 @@ const DoctorProfileTabs = ({ doctor }) => {
             )}
 
             {/* ACTION BUTTON (BOTTOM RIGHT) */}
-            {item.phone_1 && (
+            {item.phone_1 &&  item.show_call_button === 1 &&(
               <a
                 href={`tel:${item.phone_1}`}
                 className="mt-4 inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-6 py-2 rounded-md text-sm"

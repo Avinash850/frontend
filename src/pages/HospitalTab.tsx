@@ -1,217 +1,3 @@
-// import React, { useState } from "react";
-// import { FaStar } from "react-icons/fa";
-// import defaultImage from "../assets/images/default_icon.png";
-// import { useNavigate } from "react-router-dom";
-
-// const HospitalProfileTabs = ({ hospital }) => {
-//   const [activeTab, setActiveTab] = useState("overview");
-
-//   // 🔁 SAME IMAGE MODAL LOGIC AS DOCTOR
-//   const [galleryImages, setGalleryImages] = useState(null);
-//   const [activeImageIndex, setActiveImageIndex] = useState(0);
-
-//   const navigate = useNavigate();
-//   if (!hospital) return null;
-
-//   const doctors = hospital.doctors || [];
-//   const services = hospital.services || [];
-//   const stories = hospital.stories || [];
-//   const questions = hospital.questions || [];
-
-//   // future-ready
-//   const images = hospital.images || [];
-
-//   const tabs = [
-//     { key: "overview", title: "Overview" },
-//     { key: "doctors", title: `Doctors (${doctors.length})` },
-//     { key: "stories", title: `Stories (${hospital.patients_stories || 0})` },
-//     { key: "services", title: "Services" },
-//     { key: "other", title: "Other Centers" },
-//     { key: "questions", title: "Questions" },
-//   ];
-
-//   return (
-//     <div className="bg-white rounded-2xl border border-gray-200">
-//       {/* ===================== TABS ===================== */}
-//       <div className="flex border-b border-gray-200 px-6 overflow-x-auto">
-//         {tabs.map((tab) => (
-//           <button
-//             key={tab.key}
-//             onClick={() => setActiveTab(tab.key)}
-//             className={`px-4 py-3 text-sm font-semibold border-b-2 ${
-//               activeTab === tab.key
-//                 ? "text-blue-600 border-blue-600"
-//                 : "text-gray-600 border-transparent hover:text-blue-500"
-//             }`}
-//           >
-//             {tab.title}
-//           </button>
-//         ))}
-//       </div>
-
-//       {/* ===================== CONTENT ===================== */}
-//       <div className="p-6 text-sm text-gray-700">
-//         {/* ===================== OVERVIEW ===================== */}
-//         {activeTab === "overview" && (
-//           <>
-//             {/* ABOUT */}
-//             <div>
-//               <h3 className="font-semibold text-gray-900 mb-2">
-//                 About {hospital.name}
-//               </h3>
-//               <p className="leading-relaxed">
-//                 {hospital.about || hospital.short_description || ""}
-//               </p>
-//             </div>
-
-//             {/* BOTTOM ROW */}
-//             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
-//               {/* TIMINGS */}
-//               <div>
-//                 <h4 className="font-semibold mb-2">Timings</h4>
-//                 <p>{hospital.timing || ""}</p>
-//               </div>
-
-//               {/* SERVICES */}
-//               <div>
-//                 <h4 className="font-semibold mb-2">Services</h4>
-//                 <ul className="grid grid-cols-2 gap-y-1">
-//                   {services.map((s) => (
-//                     <li key={s.id}>{s.name}</li>
-//                   ))}
-//                 </ul>
-//               </div>
-
-//               {/* PHOTOS (WITH POPUP) */}
-//               <div>
-//                 <h4 className="font-semibold mb-2">Photos</h4>
-
-//                 <div className="flex items-center gap-2">
-//                   {images.slice(0, 4).map((img, i) => (
-//                     <img
-//                       key={i}
-//                       src={img.image_url || defaultImage}
-//                       onClick={() => {
-//                         setGalleryImages(images);
-//                         setActiveImageIndex(i);
-//                       }}
-//                       className="w-12 h-12 rounded object-cover border cursor-pointer"
-//                     />
-//                   ))}
-
-//                   {images.length > 4 && (
-//                     <div
-//                       onClick={() => {
-//                         setGalleryImages(images);
-//                         setActiveImageIndex(4);
-//                       }}
-//                       className="w-12 h-12 flex items-center justify-center bg-gray-100 text-xs rounded border cursor-pointer"
-//                     >
-//                       +{images.length - 4}
-//                     </div>
-//                   )}
-
-//                   {images.length === 0 && (
-//                     <span className="text-gray-400 text-sm">
-//                       No photos available
-//                     </span>
-//                   )}
-//                 </div>
-//               </div>
-//             </div>
-//           </>
-//         )}
-
-//         {/* DOCTORS */}
-//         {activeTab === "doctors" &&
-//           doctors.map((d) => (
-//             <div key={d.id}>{d.name}</div>
-//           ))}
-
-//         {/* STORIES */}
-//         {activeTab === "stories" && (
-//           <p className="text-gray-500">
-//             Patient stories will be available soon.
-//           </p>
-//         )}
-
-//         {/* SERVICES */}
-//         {activeTab === "services" && (
-//           <ul className="grid md:grid-cols-2 gap-3">
-//             {services.map((s) => (
-//               <li
-//                 key={s.id}
-//                 className="border border-gray-200 rounded-lg p-3 bg-gray-50"
-//               >
-//                 {s.name}
-//               </li>
-//             ))}
-//           </ul>
-//         )}
-
-//         {/* QUESTIONS */}
-//         {activeTab === "questions" && (
-//           <p className="text-gray-500">
-//             Questions will be available soon.
-//           </p>
-//         )}
-//       </div>
-
-//       {/* ===================== IMAGE MODAL (SAME AS DOCTOR) ===================== */}
-//       {galleryImages && (
-//         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-//           <div className="relative bg-white rounded-lg p-4 max-w-lg w-full">
-//             <button
-//               onClick={() => setGalleryImages(null)}
-//               className="absolute top-2 right-3 text-xl text-gray-600"
-//             >
-//               ✕
-//             </button>
-
-//             <img
-//               src={galleryImages[activeImageIndex].image_url}
-//               className="w-full h-80 object-cover rounded"
-//             />
-
-//             <div className="flex justify-between mt-3">
-//               <button
-//                 disabled={activeImageIndex === 0}
-//                 onClick={() =>
-//                   setActiveImageIndex((i) => i - 1)
-//                 }
-//                 className="text-blue-600 disabled:opacity-40"
-//               >
-//                 Prev
-//               </button>
-
-//               <button
-//                 disabled={
-//                   activeImageIndex === galleryImages.length - 1
-//                 }
-//                 onClick={() =>
-//                   setActiveImageIndex((i) => i + 1)
-//                 }
-//                 className="text-blue-600 disabled:opacity-40"
-//               >
-//                 Next
-//               </button>
-//             </div>
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default HospitalProfileTabs;
-
-
-
-
-
-
-
-
 import React, { useState } from "react";
 import { FaStar, FaPhone } from "react-icons/fa";
 import defaultImage from "../assets/images/default_icon.png";
@@ -353,7 +139,7 @@ const HospitalProfileTabs = ({ hospital }) => {
               <div>
                 <h4 className="font-semibold mb-2">Services</h4>
 
-                <ul className="grid grid-cols-2 gap-y-1 text-sm text-gray-700">
+                {/* <ul className="grid grid-cols-2 gap-y-1 text-sm text-gray-700">
                   {(showAllOverviewServices
                     ? services
                     : services.slice(0, 6)
@@ -367,8 +153,20 @@ const HospitalProfileTabs = ({ hospital }) => {
                       {s.name}
                     </li>
                   ))}
-                </ul>
+                </ul> */}
 
+                <ul className="space-y-1 text-sm text-gray-700">
+                  {(showAllOverviewServices ? services : services.slice(0, 6)).map((s) => (
+                    <li
+                      key={s.id}
+                      onClick={() => handleServiceClick(s.name)}
+                      className="cursor-pointer hover:text-blue-600 leading-relaxed break-words"
+                    >
+                      {s.name}
+                    </li>
+                  ))}
+                </ul>
+                
                 {services.length > 6 && (
                   <button
                     onClick={() =>

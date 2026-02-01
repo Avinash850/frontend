@@ -42,8 +42,12 @@ const Header = () => {
 
         {/* Desktop Menu */}
         <nav className="hidden md:flex items-center space-x-8">
-          <button onClick={() => handleNavigate('/video-consult')} className={`hover:text-indigo-600 ${getActiveClass('/video-consult')}`}>Video Consult</button>
-          <button onClick={() => handleNavigate('/lab-tests')} className={`hover:text-indigo-600 ${getActiveClass('/lab-tests')}`}>Lab Tests</button>
+          {/* <button onClick={() => handleNavigate('/video-consult')} className={`hover:text-indigo-600 ${getActiveClass('/video-consult')}`}>Video Consult</button>
+          <button onClick={() => handleNavigate('/lab-tests')} className={`hover:text-indigo-600 ${getActiveClass('/lab-tests')}`}>Lab Tests</button> */}
+          <button onClick={() => handleNavigate('/about')} className={`hover:text-indigo-600 ${getActiveClass('/about')}`}>About Us</button>
+          <button onClick={() => handleNavigate('/delhi/hospitals')} className={`hover:text-indigo-600 ${getActiveClass('/delhi/hospitals')}`}>Hospital</button>
+          <button onClick={() => handleNavigate('/delhi/doctors')} className={`hover:text-indigo-600 ${getActiveClass('/delhi/doctors')}`}>Doctors</button>
+          <button onClick={() => handleNavigate('/delhi/clinic')} className={`hover:text-indigo-600 ${getActiveClass('/delhi/clinic')}`}>Clinic</button>
           <button onClick={() => handleNavigate('/blogs')} className={`hover:text-indigo-600 ${getActiveClass('/blogs')}`}>Blogs</button>
         </nav>
 
@@ -66,9 +70,12 @@ const Header = () => {
       {/* Mobile Dropdown */}
       {isMenuOpen && (
         <div className="md:hidden bg-white shadow-md px-6 py-4 space-y-4">
-          <button onClick={() => handleNavigate('/video-consult')} className="block w-full text-left text-gray-600 hover:text-indigo-600">Video Consult</button>
-          <button onClick={() => handleNavigate('/lab-tests')} className="block w-full text-left text-gray-600 hover:text-indigo-600">Lab Tests</button>
-          <button onClick={() => handleNavigate('/blogs')} className="block w-full text-left text-gray-600 hover:text-indigo-600">Blogs</button>
+          {/* <button onClick={() => handleNavigate('/video-consult')} className="block w-full text-left text-gray-600 hover:text-indigo-600">Video Consult</button>
+          <button onClick={() => handleNavigate('/lab-tests')} className="block w-full text-left text-gray-600 hover:text-indigo-600">Lab Tests</button> */}
+          <button onClick={() => handleNavigate('/about')} className="block w-full text-left text-gray-600 hover:text-indigo-600">About us</button>
+          <button onClick={() => handleNavigate('/delhi/hospitals')} className="block w-full text-left text-gray-600 hover:text-indigo-600">Hospital</button>
+          <button onClick={() => handleNavigate('/delhi/doctors')} className="block w-full text-left text-gray-600 hover:text-indigo-600">Doctors</button>
+          <button onClick={() => handleNavigate('/delhi/clinic')} className="block w-full text-left text-gray-600 hover:text-indigo-600">Clinic</button>
           <button onClick={() => handleNavigate('/login')} className="block w-full text-left text-gray-600 hover:text-indigo-600">Login</button>
         </div>
       )}
