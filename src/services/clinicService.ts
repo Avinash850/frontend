@@ -38,4 +38,32 @@ export const clinicService = {
   getDoctors: async () => (await API.get("/api/masters/doctors")).data,
   getCities: async () => (await API.get("/api/masters/cities")).data,
   getAreas: async () => (await API.get("/api/masters/areas")).data,
+
+
+  /* ===============================
+   CLINIC GALLERY APIS
+   =============================== */
+
+getClinicImages: async (clinicId: number) => {
+  const res = await API.get(`/api/clinics/${clinicId}/images`);
+  return res.data;
+},
+
+uploadClinicImages: async (clinicId: number, files: File[]) => {
+  const fd = new FormData();
+  files.forEach((file) => fd.append("images", file));
+
+  const res = await API.post(
+    `/api/clinics/${clinicId}/images`,
+    fd,
+    { headers: { "Content-Type": "multipart/form-data" } }
+  );
+  return res.data;
+},
+
+deleteClinicImage: async (imageId: number) => {
+  const res = await API.delete(`/api/clinic-images/${imageId}`);
+  return res.data;
+},
+
 };

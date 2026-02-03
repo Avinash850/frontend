@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import HospitalForm from "../../components/HospitalForm";
 import { hospitalService } from "../../services/hospitalService";
+import HospitalEditWrapper from "../../components/HospitalEditWrapper";
+
 
 const Modal = ({ children, open, setOpen, title }: any) => {
   if (!open) return null;
@@ -293,15 +295,21 @@ const loadData = async () => {
           {!editItem || loadingEdit ? (
             <div className="p-6 text-center text-gray-600">Loading...</div>
           ) : (
-            <HospitalForm
-              mode="edit"
-              initialData={editItem}
+            // <HospitalForm
+            //   mode="edit"
+            //   initialData={editItem}
+            //   onClose={() => setOpenEdit(false)}
+            //   onSaved={() => {
+            //     setOpenEdit(false);
+            //     handleSaved();
+            //   }}
+            // />
+            <HospitalEditWrapper
+              hospital={editItem}
               onClose={() => setOpenEdit(false)}
-              onSaved={() => {
-                setOpenEdit(false);
-                handleSaved();
-              }}
+              onSaved={handleSaved}
             />
+
           )}
         </Modal>
       </div>

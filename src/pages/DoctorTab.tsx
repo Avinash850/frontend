@@ -4,6 +4,10 @@ import defaultImage from "../assets/images/default_icon.png";
 import { useNavigate } from "react-router-dom";
 import { FaCheckCircle, FaCreditCard } from "react-icons/fa";
 
+import { useEffect } from "react";
+import { hospitalService } from "../services/hospitalService";
+import { clinicService } from "../services/clinicService";
+
 
 const DoctorProfileTabs = ({ doctor }) => {
   const [activeTab, setActiveTab] = useState("info");
@@ -34,17 +38,49 @@ const DoctorProfileTabs = ({ doctor }) => {
      PRACTICE CARD
      ========================= */
   const PracticeCard = ({ item }) => {
+    const [galleryImagesList, setGalleryImagesList] = useState([]);
+
+    useEffect(() => {
+      if (!item?.id || !item?.type) return;
+
+      const loadImages = async () => {
+        try {
+          let data = [];
+
+          if (item.type === "hospital") {
+            data = await hospitalService.getHospitalImages(item.id);
+          } else if (item.type === "clinic") {
+            data = await clinicService.getClinicImages(item.id);
+          }
+
+          setGalleryImagesList(Array.isArray(data) ? data : []);
+        } catch (err) {
+          console.error("Failed to load gallery images", err);
+          setGalleryImagesList([]);
+        }
+      };
+
+      loadImages();
+    }, [item.id, item.type]);
+
     const goToProfile = () => {
       if (!item.slug || !item.type) return;
       navigate(`/${citySlug}/${item.type}/${item.slug}`);
     };
 
-    const images =
-      item.images && item.images.length
-        ? item.images
-        : item.image_url
-        ? [{ image_url: item.image_url }]
-        : [];
+    // const images =
+    //   item.type === "hospital"
+    //     ? galleryImagesList
+    //     : item.image_url
+    //     ? [{ image_url: item.image_url }]
+    //     : [];
+
+    //  const images =
+    //   item.images && item.images.length
+    //     ? item.images
+    //     : item.image_url
+    //     ? [{ image_url: item.image_url }]
+    //     : [];
 
     return (
       <div className="border-b py-6">
@@ -87,29 +123,29 @@ const DoctorProfileTabs = ({ doctor }) => {
             </a> */}
 
             {/* Images */}
-            {images.length > 0 && (
-              <div className="flex items-center gap-2 mt-3">
-                {images.slice(0, 3).map((img, i) => (
+            {galleryImagesList.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-3">
+                {galleryImagesList.slice(0, 3).map((img, i) => (
                   <img
                     key={i}
                     src={img.image_url || defaultImage}
                     onClick={() => {
-                      setGalleryImages(images);
+                      setGalleryImages(galleryImagesList);
                       setActiveImageIndex(i);
                     }}
                     className="w-12 h-12 rounded object-cover border cursor-pointer"
                   />
                 ))}
 
-                {images.length > 3 && (
+                {galleryImagesList.length > 3 && (
                   <div
                     onClick={() => {
-                      setGalleryImages(images);
+                      setGalleryImages(galleryImagesList);
                       setActiveImageIndex(3);
                     }}
                     className="w-12 h-12 flex items-center justify-center bg-gray-100 text-xs rounded border cursor-pointer"
                   >
-                    +{images.length - 3}
+                    +{galleryImagesList.length - 3}
                   </div>
                 )}
               </div>

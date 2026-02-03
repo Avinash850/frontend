@@ -2,12 +2,17 @@ import React, { useState } from "react";
 import { FaStar, FaPhone } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import defaultImage from "../assets/images/default_icon.png";
+import { useEffect } from "react";
+import { clinicService } from "../services/clinicService";
 
 const ClinicProfileTabs = ({ clinic }) => {
   const { city } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
   const [expanded, setExpanded] = useState(false);
+  const [images, setImages] = useState([]);
+  const [galleryImages, setGalleryImages] = useState(null);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   if (!clinic) return null;
 
@@ -26,6 +31,25 @@ const ClinicProfileTabs = ({ clinic }) => {
   const aboutText = clinic.about || clinic.short_description || "";
   const MAX_LEN = 220;
   const showText = expanded ? aboutText : aboutText.slice(0, MAX_LEN);
+
+ 
+
+  useEffect(() => {
+    if (!clinic?.id) return;
+
+    const loadImages = async () => {
+      try {
+        const data = await clinicService.getClinicImages(clinic.id);
+        setImages(Array.isArray(data) ? data : []);
+      } catch (e) {
+        console.error("Failed to load clinic images", e);
+        setImages([]);
+      }
+    };
+
+    loadImages();
+  }, [clinic?.id]);
+
 
   return (
     <div className="bg-white border border-gray-200 rounded-2xl">
@@ -97,10 +121,80 @@ const ClinicProfileTabs = ({ clinic }) => {
               </div>
 
               {/* PHOTOS (FUTURE READY) */}
-              <div>
+              {/* <div>
                 <h4 className="font-semibold mb-2">Photos</h4>
                 <p className="text-gray-400">No photos available</p>
-              </div>
+              </div> */}
+
+              <div>
+                <h4 className="font-semibold mb-2">Photos</h4>
+
+                {images.length === 0 ? (
+                  <p className="text-gray-400">No photos available</p>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {images.slice(0, 4).map((img, i) => (
+                        <img
+                          key={i}
+                          src={img.image_url || defaultImage}
+                          onClick={() => {
+                            setGalleryImages(images);
+                            setActiveImageIndex(i);
+                          }}
+                          className="w-12 h-12 rounded object-cover border cursor-pointer"
+                        />
+                      ))}
+
+                      {images.length > 4 && (
+                        <div
+                          onClick={() => {
+                            setGalleryImages(images);
+                            setActiveImageIndex(4);
+                          }}
+                          className="w-12 h-12 flex items-center justify-center bg-gray-100 text-xs rounded border cursor-pointer"
+                        >
+                          +{images.length - 4}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {galleryImages && (
+                  <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+                    <div className="relative bg-white rounded-lg p-4 max-w-lg w-full">
+                      <button
+                        onClick={() => setGalleryImages(null)}
+                        className="absolute top-2 right-3 text-xl text-gray-600"
+                      >
+                        ✕
+                      </button>
+
+                      <img
+                        src={galleryImages[activeImageIndex].image_url}
+                        className="w-full h-80 object-cover rounded"
+                      />
+
+                      <div className="flex justify-between mt-3">
+                        <button
+                          disabled={activeImageIndex === 0}
+                          onClick={() => setActiveImageIndex((i) => i - 1)}
+                          className="text-blue-600 disabled:opacity-40"
+                        >
+                          Prev
+                        </button>
+
+                        <button
+                          disabled={activeImageIndex === galleryImages.length - 1}
+                          onClick={() => setActiveImageIndex((i) => i + 1)}
+                          className="text-blue-600 disabled:opacity-40"
+                        >
+                          Next
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
             </div>
           </>
         )}
@@ -111,16 +205,40 @@ const ClinicProfileTabs = ({ clinic }) => {
             <h2 className="text-lg font-semibold mb-4">
               Doctors in {clinic.name}
             </h2>
+           
+            {/* FILTER BAR (UI only, logic later) */}
+            <div className="border border-gray-200 rounded-lg p-4 mb-6">
+              <p className="text-sm text-gray-600 mb-2">
+                Filter specialties…
+              </p>
 
-            {/* <div className="space-y-6">
-              {doctors.length > 0 ? (
-                doctors.map((doctor) => (
+              <div className="flex flex-wrap gap-2">
+                <button className="px-4 py-1 text-sm rounded-full bg-blue-600 text-white">
+                  All ({doctors.length})
+                </button>
+                
+                {Array.from(
+                  new Set(doctors.map(d => d.designation).filter(Boolean))
+                ).map((spec, i) => (
+                  <button
+                    key={i}
+                    className="px-4 py-1 text-sm rounded-full bg-gray-100 text-gray-700"
+                  >
+                    {spec}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* DOCTOR LIST */}
+              <div className="space-y-6">
+                {doctors.map((doctor) => (
                   <div
                     key={doctor.id}
                     className="border border-gray-200 rounded-xl p-6"
                   >
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                    
+                      {/* LEFT */}
                       <div className="md:col-span-7 flex gap-4">
                         <img
                           src={doctor.image_url || defaultImage}
@@ -132,10 +250,10 @@ const ClinicProfileTabs = ({ clinic }) => {
                           <h3
                             className="text-blue-600 font-semibold text-lg cursor-pointer hover:underline"
                             onClick={() =>
-                              navigate(`/${citySlug}/doctor/${doctor.slug}`)
+                              navigate(`/${hospital.city_name?.toLowerCase()}/doctor/${doctor.slug}`)
                             }
                           >
-                            {doctor.name}
+                            Dr. {doctor.name}
                           </h3>
 
                           {doctor.degree && (
@@ -156,10 +274,12 @@ const ClinicProfileTabs = ({ clinic }) => {
                         </div>
                       </div>
 
-                     
+                      {/* RIGHT */}
                       <div className="md:col-span-5 text-sm space-y-2">
                         {doctor.patients_count > 0 && (
-                          <p>💬 {doctor.patients_count} Patient Stories</p>
+                          <p>
+                            💬 {doctor.patients_count} Patient Stories
+                          </p>
                         )}
 
                         {doctor.consultation_fee && (
@@ -169,10 +289,12 @@ const ClinicProfileTabs = ({ clinic }) => {
                         )}
 
                         {doctor.timings && (
-                          <p>🕒 {doctor.timings}</p>
+                          <p>
+                            🕒 {doctor.timings}
+                          </p>
                         )}
 
-                        
+                        {/* ACTION BUTTONS */}
                         <div className="flex gap-3 mt-4">
                           <button className="border border-blue-600 text-blue-600 px-4 py-2 rounded-md text-sm">
                             Contact Clinic
@@ -185,117 +307,8 @@ const ClinicProfileTabs = ({ clinic }) => {
                       </div>
                     </div>
                   </div>
-                ))
-              ) : (
-                <p className="text-gray-500 text-sm">
-                  No doctors listed for this clinic.
-                </p>
-              )}
-            </div> */}
-
-            {/* FILTER BAR (UI only, logic later) */}
-                            <div className="border border-gray-200 rounded-lg p-4 mb-6">
-                              <p className="text-sm text-gray-600 mb-2">
-                                Filter specialties…
-                              </p>
-            
-                              <div className="flex flex-wrap gap-2">
-                                <button className="px-4 py-1 text-sm rounded-full bg-blue-600 text-white">
-                                  All ({doctors.length})
-                                </button>
-                                
-                                {Array.from(
-                                  new Set(doctors.map(d => d.designation).filter(Boolean))
-                                ).map((spec, i) => (
-                                  <button
-                                    key={i}
-                                    className="px-4 py-1 text-sm rounded-full bg-gray-100 text-gray-700"
-                                  >
-                                    {spec}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-            
-                            {/* DOCTOR LIST */}
-                              <div className="space-y-6">
-                                {doctors.map((doctor) => (
-                                  <div
-                                    key={doctor.id}
-                                    className="border border-gray-200 rounded-xl p-6"
-                                  >
-                                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                                      {/* LEFT */}
-                                      <div className="md:col-span-7 flex gap-4">
-                                        <img
-                                          src={doctor.image_url || defaultImage}
-                                          alt={doctor.name}
-                                          className="w-24 h-24 object-cover rounded border"
-                                        />
-            
-                                        <div>
-                                          <h3
-                                            className="text-blue-600 font-semibold text-lg cursor-pointer hover:underline"
-                                            onClick={() =>
-                                              navigate(`/${hospital.city_name?.toLowerCase()}/doctor/${doctor.slug}`)
-                                            }
-                                          >
-                                            Dr. {doctor.name}
-                                          </h3>
-            
-                                          {doctor.degree && (
-                                            <p className="text-sm">{doctor.degree}</p>
-                                          )}
-            
-                                          {doctor.experience_years && (
-                                            <p className="text-sm text-gray-600">
-                                              {doctor.experience_years} years experience overall
-                                            </p>
-                                          )}
-            
-                                          {doctor.designation && (
-                                            <p className="text-sm text-gray-600">
-                                              {doctor.designation}
-                                            </p>
-                                          )}
-                                        </div>
-                                      </div>
-            
-                                      {/* RIGHT */}
-                                      <div className="md:col-span-5 text-sm space-y-2">
-                                        {doctor.patients_count > 0 && (
-                                          <p>
-                                            💬 {doctor.patients_count} Patient Stories
-                                          </p>
-                                        )}
-            
-                                        {doctor.consultation_fee && (
-                                          <p className="font-semibold">
-                                            ₹{doctor.consultation_fee}
-                                          </p>
-                                        )}
-            
-                                        {doctor.timings && (
-                                          <p>
-                                            🕒 {doctor.timings}
-                                          </p>
-                                        )}
-            
-                                        {/* ACTION BUTTONS */}
-                                        <div className="flex gap-3 mt-4">
-                                          <button className="border border-blue-600 text-blue-600 px-4 py-2 rounded-md text-sm">
-                                            Contact Clinic
-                                          </button>
-            
-                                          <button className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm">
-                                            Book Clinic Visit
-                                          </button>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
+                ))}
+              </div>
           </div>
         )}
 

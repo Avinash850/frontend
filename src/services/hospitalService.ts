@@ -40,4 +40,36 @@ export const hospitalService = {
   getSymptoms: async () => (await API.get("/api/masters/symptoms")).data,
   getCities: async () => (await API.get("/api/masters/cities")).data,
   getAreas: async () => (await API.get("/api/masters/areas")).data,
+
+
+
+
+
+  // hospital gallery APIs
+getHospitalImages: async (hospitalId: number) => {
+  const res = await API.get(`/api/hospitals/${hospitalId}/images`);
+  return res.data;
+},
+
+uploadHospitalImages: async (hospitalId: number, files: File[]) => {
+  const formData = new FormData();
+
+  files.forEach((file) => {
+    formData.append("images", file);
+  });
+
+  const res = await API.post(
+    `/api/hospitals/${hospitalId}/images`,
+    formData,
+    { headers: { "Content-Type": "multipart/form-data" } }
+  );
+
+  return res.data;
+},
+
+deleteHospitalImage: async (imageId: number) => {
+  const res = await API.delete(`/api/hospital-images/${imageId}`);
+  return res.data;
+},
+
 };

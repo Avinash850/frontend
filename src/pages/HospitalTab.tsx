@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { FaStar, FaPhone } from "react-icons/fa";
 import defaultImage from "../assets/images/default_icon.png";
 import { useNavigate } from "react-router-dom";
+import { hospitalService } from "../services/hospitalService";
+import { useEffect } from "react";
+
 
 const HospitalProfileTabs = ({ hospital }) => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -10,13 +13,17 @@ const HospitalProfileTabs = ({ hospital }) => {
 
   const [galleryImages, setGalleryImages] = useState(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [images, setImages] = useState([]);
+const [loadingImages, setLoadingImages] = useState(false);
+
 
   const navigate = useNavigate();
   if (!hospital) return null;
 
   const doctors = hospital.doctors || [];
   const services = hospital.services || [];
-  const images = hospital.images || [];
+  // const images = hospital.images || [];
+  
 
   const citySlug = (hospital.city_name || "")
     .toLowerCase()
@@ -36,6 +43,27 @@ const HospitalProfileTabs = ({ hospital }) => {
     if (!name || !citySlug) return;
     navigate(`/${citySlug}/${toSlug(name)}`);
   };
+
+
+  useEffect(() => {
+  if (!hospital?.id) return;
+
+  const loadImages = async () => {
+    try {
+      setLoadingImages(true);
+      const data = await hospitalService.getHospitalImages(hospital.id);
+      setImages(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Failed to load hospital images", err);
+      setImages([]);
+    } finally {
+      setLoadingImages(false);
+    }
+  };
+
+  loadImages();
+}, [hospital?.id]);
+
 
   const tabs = [
     { key: "overview", title: "Overview" },
@@ -166,7 +194,7 @@ const HospitalProfileTabs = ({ hospital }) => {
                     </li>
                   ))}
                 </ul>
-                
+
                 {services.length > 6 && (
                   <button
                     onClick={() =>
@@ -187,8 +215,11 @@ const HospitalProfileTabs = ({ hospital }) => {
               </div>
 
               <div>
-                <h4 className="font-semibold mb-2">Photos</h4>
-                <div className="flex items-center gap-2">
+                <h4 className="font-semibold mb-2">
+                  Photos {images.length > 0 && `(${images.length})`}
+                </h4>
+
+                <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
                   {images.slice(0, 4).map((img, i) => (
                     <img
                       key={i}

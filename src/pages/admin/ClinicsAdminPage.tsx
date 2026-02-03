@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import ClinicForm from "../../components/ClinicForm";
 import { clinicService } from "../../services/clinicService";
+import ClinicEditWrapper from "../../components/ClinicEditWrapper";
+
 
 const Modal = ({ children, open, setOpen, title }: any) => {
   if (!open) return null;
@@ -287,15 +289,21 @@ const ClinicAdminPage: React.FC = () => {
           {!editItem || loadingEdit ? (
             <div className="p-6 text-center text-gray-600">Loading...</div>
           ) : (
-            <ClinicForm
-              mode="edit"
-              initialData={editItem}
+            // <ClinicForm
+            //   mode="edit"
+            //   initialData={editItem}
+            //   onClose={() => setOpenEdit(false)}
+            //   onSaved={() => {
+            //     setOpenEdit(false);
+            //     handleSaved();
+            //   }}
+            // />
+            <ClinicEditWrapper
+              clinic={editItem}
               onClose={() => setOpenEdit(false)}
-              onSaved={() => {
-                setOpenEdit(false);
-                handleSaved();
-              }}
+              onSaved={handleSaved}
             />
+
           )}
         </Modal>
       </div>
